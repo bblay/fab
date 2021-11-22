@@ -29,7 +29,7 @@ from fab.tasks.c import \
     CPreProcessor, \
     CAnalyser, \
     CCompiler
-from fab.source_tree import get_fpaths_by_type, file_walk
+from fab.source_tree import get_fpaths_by_type, file_walk 
 from fab.tree import ProgramUnit, by_type, extract_sub_tree
 from fab.util import log_or_dot_finish
 
@@ -175,6 +175,13 @@ class Fab(object):
 
 
     def run(self, source_paths: List[Path]):
+
+        # copy src 
+        for source_path in source_paths:
+            dest = Path(self._workspace / source_path.parts[-1])
+            if not dest.exists():
+                self._workspace.mkdir(parents=True, exist_ok=True)
+            shutil.copytree(source_path, dest, dirs_exist_ok=True)
 
         # walk the source folder
         fpaths = []
