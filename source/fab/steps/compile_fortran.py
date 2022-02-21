@@ -116,7 +116,7 @@ class CompileFortran(MpExeStep):
 
         output_fpath = analysed_file.fpath.with_suffix('.o')
         if self._config.debug_skip and output_fpath.exists():
-            log_or_dot(logger, f'Compiler skipping: {output_fpath}')
+            log_or_dot(logger, f'Compiler skipping: {analysed_file.fpath}')
             return CompiledFile(analysed_file, output_fpath)
 
         command.extend(['-o', str(output_fpath)])

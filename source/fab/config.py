@@ -1,8 +1,11 @@
+import os
 from fnmatch import fnmatch
 from multiprocessing import cpu_count
 from string import Template
 from pathlib import Path
 from typing import List, Set, Tuple, Optional
+
+import fab
 
 from fab.constants import BUILD_OUTPUT, SOURCE_ROOT
 
@@ -11,12 +14,18 @@ from fab.steps import Step
 
 class Config(object):
 
-    def __init__(self, label, workspace,
+    def __init__(self, label, fab_workspace_root=None,
                  grab_config=None, steps: List[Step]=None,
                  use_multiprocessing=True, n_procs=max(1, cpu_count() - 1), debug_skip=False):
 
         self.label = label
-        self.workspace = workspace
+
+        # self.workspace = workspace
+        if fab_workspace_root:
+            fab_workspace_root = Path(fab_workspace_root)
+        else:
+            fab_workspace_root = Path(os.path.dirname(fab.__file__)) / "fab-workspace"
+        self.workspace = fab_workspace_root / (label.replace(' ', '-'))
 
         # source config
         self.grab_config: Set = grab_config or set()

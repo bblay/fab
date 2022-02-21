@@ -5,6 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
+import fab
 from fab.builder import Build
 from fab.config import Config
 from fab.constants import SOURCE_ROOT
@@ -18,16 +19,17 @@ from fab.steps.walk_source import FindSourceFiles
 from fab.util import time_logger
 
 
-def gcom_object_archive_config():
+def gcom_object_archive_config(fab_workspace_root=None):
+    """
+    Create a library for static linking.
 
-    workspace = Path(os.path.dirname(__file__)) / "tmp-workspace" / 'gcom'
-
-    config = Config(label='gcom object archive', workspace=workspace)
+    """
+    config = Config(label='gcom object archive', fab_workspace_root=fab_workspace_root)
 
     config.grab_config = {("gcom", "~/svn/gcom/trunk/build"), }
 
     config.steps = [
-        FindSourceFiles(workspace / SOURCE_ROOT),  # template?
+        FindSourceFiles(config.workspace / SOURCE_ROOT),  # template?
         CPreProcessor(),
         FortranPreProcessor(
             common_flags=[
@@ -51,28 +53,36 @@ def gcom_object_archive_config():
     return config
 
 
-def gcom_shared_object_config():
+def gcom_shared_object_config(fab_workspace_root=None):
+    """
+    Create a library for dynamic linking.
+
+    """
     from fab.dep_tree import by_type
 
-    config = gcom_object_archive_config()
-    config.label = 'gcom shared object'
+    static_config = gcom_object_archive_config()
 
-    # don't pull the source again
-    config.grab_config = None
+    shared_config = Config(
+        label='gcom shared object',
+        fab_workspace_root=fab_workspace_root,
+        grab_config=static_config.grab_config,
+        steps=static_config.steps,
+    )
 
     # compile with fPIC
-    fc: CompileFortran = list(by_type(config.steps, CompileFortran))[0]
+    fc = list(by_type(shared_config.steps, CompileFortran))[0]  # todo: ugly
     fc.flags.common_flags.append('-fPIC')
 
-    cc: CompileC = list(by_type(config.steps, CompileC))[0]
+    cc = list(by_type(shared_config.steps, CompileC))[0]
     cc.flags.common_flags.append('-fPIC')
 
-    # link the object archive
-    config.steps.append(LinkSharedObject(
+    # todo: this is a little hacky as it includes the step to create the static library too
+    # link the object archive into a shared object.
+    shared_config.steps.append(LinkSharedObject(
         linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
         output_fpath='$output/libgcom.so'))
 
-    return config
+    return shared_config
 
 
 def main():
@@ -80,8 +90,9 @@ def main():
     # logger.setLevel(logging.DEBUG)
     logger.setLevel(logging.INFO)
 
-    # ignore this, it's not here
     config = gcom_object_archive_config()
+
+    # ignore this, it's not here :)
     with time_logger("grabbing"):
         grab_will_do_this(config.grab_config, config.workspace)
 

@@ -3,6 +3,7 @@ Link an executable.
 
 """
 import logging
+from pathlib import Path
 from string import Template
 from typing import List
 
@@ -13,7 +14,6 @@ from fab.util import log_or_dot, run_command, Artefacts, SourceGetter
 
 logger = logging.getLogger('fab')
 
-
 DEFAULT_SOURCE_GETTER = Artefacts(['compiled_c', 'compiled_fortran'])
 
 
@@ -22,7 +22,8 @@ class LinkExe(Step):
     A build step to produce an executable from a list of object (.o) files.
 
     """
-    def __init__(self, linker: str, output_fpath: str, flags=None, source: SourceGetter=None, name='link exe'):
+
+    def __init__(self, linker: str, output_fpath: str, flags=None, source: SourceGetter = None, name='link exe'):
         """
         Args:
             - linker: E.g 'gcc' or 'ld'.
@@ -50,7 +51,13 @@ class LinkExe(Step):
         compiled_files = self.source_getter(artefacts)
 
         command = [self.linker]
-        command.extend(['-o', Template(self.output_fpath).substitute(output=config.workspace/BUILD_OUTPUT)])
+
+        output_fpath = Template(self.output_fpath).substitute(output=config.workspace / BUILD_OUTPUT)
+        if self._config.debug_skip and Path(output_fpath).exists():
+            log_or_dot(logger, f'LinkExe skipping: {output_fpath}')
+            return self.output_fpath
+
+        command.extend(['-o', output_fpath])
         command.extend([str(a.output_fpath) for a in compiled_files])
         # note: this must this come after the list of object files?
         command.extend(self.flags)
@@ -64,13 +71,14 @@ class LinkExe(Step):
         return self.output_fpath
 
 
+# todo: this is not a subclass, it is a sibling.
 class LinkSharedObject(LinkExe):
 
-    def __init__(self, linker: str, output_fpath: str, flags=None, source: SourceGetter=None, name='link shared object'):
+    def __init__(self, linker: str, output_fpath: str, flags=None,
+                 source: SourceGetter = None, name='link shared object'):
         super().__init__(linker=linker, flags=flags, output_fpath=output_fpath, source=source, name=name)
 
         ensure_flags = ['-fPIC', '-shared']
         for f in ensure_flags:
             if f not in self.flags:
                 self.flags.append(f)
-

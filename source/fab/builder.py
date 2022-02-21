@@ -10,7 +10,7 @@ from datetime import datetime
 from pathlib import Path
 
 from fab.config import Config
-from fab.constants import BUILD_OUTPUT
+from fab.constants import BUILD_OUTPUT, SOURCE_ROOT
 from fab.util import time_logger
 
 logger = logging.getLogger('fab')
@@ -86,6 +86,8 @@ class Build(object):
             config.workspace.mkdir(parents=True)
         if not (config.workspace / BUILD_OUTPUT).exists():
             (config.workspace / BUILD_OUTPUT).mkdir()
+        if not (config.workspace / SOURCE_ROOT).exists():
+            (config.workspace / SOURCE_ROOT).mkdir()
 
     def run(self):
         logger.info(f"{datetime.now()}")

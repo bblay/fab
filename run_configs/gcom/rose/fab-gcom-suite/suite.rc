@@ -1,0 +1,14 @@
+[scheduling]
+    [[dependencies]]
+        graph = hello_{{WORLD}}
+
+[runtime]
+    [[hello_{{WORLD}}]]
+        script = echo "$GREETING {{WORLD}}"
+        [[[job]]]
+            batch system = slurm
+            execution time limit = PT10M
+        [[[directives]]]
+            --mem=500
+            --ntasks=4
+            --export=NONE

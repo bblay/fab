@@ -9,7 +9,7 @@ from fab.dep_tree import AnalysedFile
 
 from fab.steps.mp_exe import MpExeStep
 from fab.tasks import TaskException
-from fab.util import CompiledFile, run_command, SourceGetter, FilterBuildTree
+from fab.util import CompiledFile, run_command, SourceGetter, FilterBuildTree, log_or_dot
 
 logger = logging.getLogger('fab')
 
@@ -58,6 +58,10 @@ class CompileC(MpExeStep):
         command.append(str(analysed_file.fpath))
 
         output_file = analysed_file.fpath.with_suffix('.o')
+        if self._config.debug_skip and output_file.exists():
+            log_or_dot(logger, f'CCompile skipping: {analysed_file.fpath}')
+            return CompiledFile(analysed_file, output_file)
+
         command.extend(['-o', str(output_file)])
 
         logger.debug('Running command: ' + ' '.join(command))

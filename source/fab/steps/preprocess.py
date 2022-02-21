@@ -19,16 +19,14 @@ class PreProcessor(MpExeStep):
     Base class for preprocessors. A build step which calls a preprocessor.
 
     """
-
-    # todo: make abstract, we don't really need these in the base class
-    DEFAULT_SOURCE = None
-    DEFAULT_OUTPUT_NAME = ''
-    DEFAULT_OUTPUT_SUFFIX = ''
+    DEFAULT_SOURCE: SourceGetter
+    DEFAULT_OUTPUT_NAME: str
+    DEFAULT_OUTPUT_SUFFIX: str
+    LABEL: str
 
     def __init__(self,
                  source: SourceGetter=None, output_artefact=None, output_suffix=None,
-                 preprocessor='cpp', common_flags: List[str]=None, path_flags: List=None,
-                 name='preprocess'):
+                 preprocessor='cpp', common_flags: List[str]=None, path_flags: List=None):
         """
         Kwargs:
             - source: Defines the files to preprocess. Defaults to DEFAULT_SOURCE.
@@ -40,7 +38,7 @@ class PreProcessor(MpExeStep):
             - name: Used for logger output.
 
         """
-        super().__init__(exe=preprocessor, common_flags=common_flags, path_flags=path_flags, name=name)
+        super().__init__(exe=preprocessor, common_flags=common_flags, path_flags=path_flags, name=self.LABEL)
 
         self.source_getter = source or self.DEFAULT_SOURCE
         self.output_artefact = output_artefact or self.DEFAULT_OUTPUT_NAME
@@ -113,6 +111,7 @@ class FortranPreProcessor(PreProcessor):
     DEFAULT_SOURCE = FilterFpaths('all_source', ['.F90', '.f90'])
     DEFAULT_OUTPUT_NAME = 'preprocessed_fortran'
     DEFAULT_OUTPUT_SUFFIX = '.f90'
+    LABEL = 'preprocess fortran'
 
 
 class CPreProcessor(PreProcessor):
@@ -127,3 +126,4 @@ class CPreProcessor(PreProcessor):
     DEFAULT_SOURCE = FilterFpaths('all_source', ['.c'])
     DEFAULT_OUTPUT_NAME = 'preprocessed_c'
     DEFAULT_OUTPUT_SUFFIX = '.c'
+    LABEL = 'preprocess c'
