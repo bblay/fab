@@ -5,7 +5,8 @@ Gather files from a source folder.
 from pathlib import Path
 from typing import Optional, List, Tuple
 
-from fab.config import PathFilter
+from fab.build_config import PathFilter
+
 from fab.constants import BUILD_OUTPUT
 
 from fab.steps import Step
