@@ -12,8 +12,8 @@ from fab.steps import Step
 
 import fab
 from fab.builder import Build
-from fab.config import AddFlags, Config
-from fab.constants import SOURCE_ROOT, BUILD_OUTPUT
+from fab.build_config import AddFlags, BuildConfig
+from fab.constants import SOURCE, BUILD_OUTPUT
 from fab.dep_tree import AnalysedFile
 from fab.steps.analyse import Analyse
 from fab.steps.c_pragma_injector import CPragmaInjector
@@ -40,7 +40,7 @@ from fab.util import time_logger, case_insensitive_replace, Artefact, run_comman
 
 def um_atmos_safe_config(fab_workspace_root=None):
 
-    config = Config(
+    config = BuildConfig(
         label='um_atmos_safe',
         fab_workspace_root=fab_workspace_root,
         # use_multiprocessing=False,
@@ -110,9 +110,9 @@ def um_atmos_safe_config(fab_workspace_root=None):
 
         MyCustomCodeFixes(name="my custom code fixes"),
 
-        FindSourceFiles(source_root=config.workspace / SOURCE_ROOT, file_filtering=file_filtering),  # template?
+        FindSourceFiles(source_root=config.workspace / SOURCE, file_filtering=file_filtering),  # template?
 
-        RootIncFiles(config.workspace / SOURCE_ROOT),
+        RootIncFiles(config.workspace / SOURCE),
 
         CPragmaInjector(),
 
@@ -281,7 +281,7 @@ def grab_will_do_this(src_paths, workspace):
         #     ignore=shutil.ignore_patterns('.svn')
         # )
 
-        command = ['rsync', '-ruq', str(os.path.expanduser(src_path)), str(workspace / SOURCE_ROOT / label)]
+        command = ['rsync', '-ruq', str(os.path.expanduser(src_path)), str(workspace / SOURCE / label)]
         run_command(command)
 
 

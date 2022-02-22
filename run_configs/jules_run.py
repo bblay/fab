@@ -7,10 +7,10 @@ from pathlib import Path
 
 from fab.steps.root_inc_files import RootIncFiles
 
-from fab.config import Config
+from fab.build_config import BuildConfig
 
 from fab.builder import Build
-from fab.constants import SOURCE_ROOT
+from fab.constants import SOURCE
 from fab.steps.analyse import Analyse
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
@@ -24,7 +24,7 @@ def jules_config():
 
     workspace = Path(os.path.dirname(__file__)) / "tmp-workspace" / 'jules'
 
-    config = Config(label='Jules Build', workspace=workspace)
+    config = BuildConfig(label='Jules Build', workspace=workspace)
     # config.use_multiprocessing = False
     config.debug_skip = True
 
@@ -45,12 +45,12 @@ def jules_config():
 
     config.steps = [
 
-        FindSourceFiles(workspace / SOURCE_ROOT, file_filtering=[
+        FindSourceFiles(workspace / SOURCE, file_filtering=[
             (['src/control/um/'], False),
             (['src/initialisation/um/'], False),
             (['src/params/shared/cable_maths_constants_mod.F90'], False)]),
 
-        RootIncFiles(workspace / SOURCE_ROOT),
+        RootIncFiles(workspace / SOURCE),
 
         CPreProcessor(),
 
@@ -98,7 +98,7 @@ def grab_will_do_this(src_paths, workspace):
     for label, src_path in src_paths:
         shutil.copytree(
             os.path.expanduser(src_path),
-            workspace / SOURCE_ROOT / label,
+            workspace / SOURCE / label,
             dirs_exist_ok=True,
             ignore=shutil.ignore_patterns('.svn')
         )

@@ -3,16 +3,13 @@ from fnmatch import fnmatch
 from multiprocessing import cpu_count
 from string import Template
 from pathlib import Path
-from typing import List, Set, Tuple, Optional
+from typing import List, Set
 
-import fab
-
-from fab.constants import BUILD_OUTPUT, SOURCE_ROOT
-
+from fab.constants import BUILD_OUTPUT, SOURCE
 from fab.steps import Step
 
 
-class Config(object):
+class BuildConfig(object):
 
     def __init__(self, label, fab_workspace_root=None,
                  grab_config=None, steps: List[Step]=None,
@@ -20,17 +17,17 @@ class Config(object):
 
         self.label = label
 
-        # self.workspace = workspace
+        # workspace folder
         if fab_workspace_root:
             fab_workspace_root = Path(fab_workspace_root)
+        elif os.getenv("FAB_WORKSPACE"):
+            fab_workspace_root = os.getenv("FAB_WORKSPACE")
         else:
-            fab_workspace_root = Path(os.path.dirname(fab.__file__)) / "fab-workspace"
+            fab_workspace_root = Path("fab-workspace")
         self.workspace = fab_workspace_root / (label.replace(' ', '-'))
 
         # source config
         self.grab_config: Set = grab_config or set()
-        # file_filtering = file_filtering or []
-        # self.path_filters: List[PathFilter] = [PathFilter(*i) for i in file_filtering]
 
         # build steps
         self.steps: List[Step] = steps or []  # default, zero-config steps here
@@ -68,7 +65,7 @@ class AddFlags(object):
         See if our filter matches the incoming file. If it does, add our flags.
 
         """
-        params = {'relative': fpath.parent, 'source': workspace/SOURCE_ROOT, 'output': workspace/BUILD_OUTPUT}
+        params = {'relative': fpath.parent, 'source': workspace / SOURCE, 'output': workspace / BUILD_OUTPUT}
 
         # does the file path match our filter?
         if not self.match or fnmatch(fpath, Template(self.match).substitute(params)):
@@ -97,7 +94,7 @@ class FlagsConfig(object):
         # We COULD make the user pass these template params to the constructor
         # but we have a design requirement to minimise the config burden on the user,
         # so we take care of it for them here instead.
-        params = {'source': workspace / SOURCE_ROOT, 'output': workspace / BUILD_OUTPUT}
+        params = {'source': workspace / SOURCE, 'output': workspace / BUILD_OUTPUT}
         flags = [Template(i).substitute(params) for i in self.common_flags]
 
         for flags_modifier in self.path_flags:
