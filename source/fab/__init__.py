@@ -3,13 +3,13 @@
 # For further details please refer to the file COPYRIGHT
 # which you should have received as part of this distribution
 ##############################################################################
-'''
+"""
 Flexible build system for scientific software.
-'''
+"""
 
+import logging
 
-import fab.builder as builder
-
+logging.getLogger('fab').setLevel(logging.INFO)
 
 __version__ = '2020.4.dev0'
 

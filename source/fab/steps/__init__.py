@@ -15,6 +15,11 @@ class Step(object):
     def __init__(self, name):
         self.name = name
 
+    # todo: it is the responsibility of all steps, which produce an output file from an input file,
+    #       to ensure the output file path is translated from possibly being in the source folder,
+    #       into a path inside the project workspace, using this functions. (word this better!)
+    # def source_to_output_fpath():
+
     # @abstractmethod
     # todo: too much to send the whole config through?
     #       it allows step manipulation, adding steps, etc

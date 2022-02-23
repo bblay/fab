@@ -1,23 +1,21 @@
 #!/usr/bin/env python
-
+import logging
 import os
 
 from fab.build_config import BuildConfig
-from fab.constants import SOURCE
-from fab.fab_main import fab_main
 from fab.steps.link_exe import LinkSharedObject
-from run_configs.gcom.gcom_build_common import common_build_steps
+from gcom_build_common import common_build_steps
+from grab_gcom import gcom_source_config
 
 
-def gcom_so_config(fab_workspace_root=None):
+def gcom_so_config():
     """
     Create a shared object library for dynamic linking.
 
     """
-    config = BuildConfig(label='gcom shared object', fab_workspace_root=fab_workspace_root)
-    config.grab_config = {("gcom", "/home/h02/bblay/svn/gcom/trunk/build/"), }
+    config = BuildConfig(label='gcom shared object', source_root=gcom_source_config().source_root)
     config.steps = [
-        *common_build_steps(source_folder=config.workspace / SOURCE, fpic=True),
+        *common_build_steps(fpic=True),
         LinkSharedObject(
             # todo: how best to specify this location
             linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
@@ -28,4 +26,4 @@ def gcom_so_config(fab_workspace_root=None):
 
 
 if __name__ == '__main__':
-    fab_main(gcom_so_config())
+    gcom_so_config().run()

@@ -1,20 +1,21 @@
+#!/usr/bin/env python
+import logging
+
 from fab.build_config import BuildConfig
 from fab.steps.archive_objects import ArchiveObjects
-from fab.steps.grab import GrabFolder
-from gcom_rose_suite.gcom_build_common import common_build_steps
+from gcom_build_common import common_build_steps
+from grab_gcom import gcom_source_config
 
 
 def gcom_ar_config():
     """
-    Create both a shared object and an object archive.
+    Create an object archive library for static linking.
 
     """
-    config = BuildConfig(label='gcom shared and static libraries')
+    config = BuildConfig(label='gcom object archive', source_root=gcom_source_config().source_root)
     config.steps = [
-        GrabFolder(src="/home/h02/bblay/svn/gcom/trunk/build/", dst_label="gcom"),
         *common_build_steps(),
         ArchiveObjects(archiver='ar', output_fpath='$output/libgcom.a'),
-
     ]
 
     return config

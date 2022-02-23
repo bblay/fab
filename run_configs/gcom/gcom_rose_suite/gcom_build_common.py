@@ -20,9 +20,9 @@ def compilers(fpic=False) -> List[Step]:
     ]
 
 
-def common_build_steps(source_folder, fpic=False) -> List[Step]:
+def common_build_steps(fpic=False) -> List[Step]:
     steps: List[Step] = [
-        FindSourceFiles(source_root=source_folder),
+        FindSourceFiles(),
         CPreProcessor(),
         FortranPreProcessor(
             common_flags=[

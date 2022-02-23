@@ -108,3 +108,6 @@ venv.bak/
 
 # Profiler stats
 .pstats
+
+# Fab workspace(s)
+fab-workspace/

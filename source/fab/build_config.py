@@ -1,4 +1,6 @@
+import logging
 import os
+from datetime import datetime
 from fnmatch import fnmatch
 from multiprocessing import cpu_count
 from string import Template
@@ -7,12 +9,15 @@ from typing import List, Set
 
 from fab.constants import BUILD_OUTPUT, SOURCE
 from fab.steps import Step
+from fab.util import time_logger
+
+logger = logging.getLogger('fab')
 
 
 class BuildConfig(object):
 
-    def __init__(self, label, fab_workspace_root=None,
-                 grab_config=None, steps: List[Step]=None,
+    def __init__(self, label, source_root=None,
+                 fab_workspace_root=None, steps: List[Step]=None,
                  use_multiprocessing=True, n_procs=max(1, cpu_count() - 1), debug_skip=False):
 
         self.label = label
@@ -27,15 +32,29 @@ class BuildConfig(object):
         self.workspace = fab_workspace_root / (label.replace(' ', '-'))
 
         # source config
-        self.grab_config: Set = grab_config or set()
+        self.source_root = source_root or self.workspace / SOURCE
 
         # build steps
-        self.steps: List[Step] = steps or []  # default, zero-config steps here
+        self.steps: List[Step] = steps or []  # use default zero-config steps here
 
         # step run config
         self.use_multiprocessing = use_multiprocessing
         self.n_procs = n_procs
         self.debug_skip = debug_skip
+
+    def run(self):
+        logger.info(f"{datetime.now()}")
+        logger.info(f"use_multiprocessing = {self.use_multiprocessing}")
+        if self.use_multiprocessing:
+            logger.info(f"n_procs = {self.n_procs}")
+
+        if not self.workspace.exists():
+            self.workspace.mkdir(parents=True)
+
+        artefacts = dict()
+        for step in self.steps:
+            with time_logger(step.name):
+                step.run(artefacts=artefacts, config=self)  # todo: smells like an anti pattern
 
 
 class PathFilter(object):
@@ -60,12 +79,12 @@ class AddFlags(object):
         self.match: str = match
         self.flags: List[str] = flags
 
-    def run(self, fpath: Path, input_flags: List[str], workspace: Path):
+    def run(self, fpath: Path, input_flags: List[str], source_root: Path, workspace: Path):
         """
         See if our filter matches the incoming file. If it does, add our flags.
 
         """
-        params = {'relative': fpath.parent, 'source': workspace / SOURCE, 'output': workspace / BUILD_OUTPUT}
+        params = {'relative': fpath.parent, 'source': source_root, 'output': workspace / BUILD_OUTPUT}
 
         # does the file path match our filter?
         if not self.match or fnmatch(fpath, Template(self.match).substitute(params)):
@@ -89,15 +108,15 @@ class FlagsConfig(object):
         self.common_flags = common_flags or []
         self.path_flags = path_flags or []
 
-    def flags_for_path(self, path, workspace):
+    def flags_for_path(self, path, source_root, workspace):
 
         # We COULD make the user pass these template params to the constructor
         # but we have a design requirement to minimise the config burden on the user,
         # so we take care of it for them here instead.
-        params = {'source': workspace / SOURCE, 'output': workspace / BUILD_OUTPUT}
+        params = {'source': source_root, 'output': workspace / BUILD_OUTPUT}
         flags = [Template(i).substitute(params) for i in self.common_flags]
 
         for flags_modifier in self.path_flags:
-            flags_modifier.run(path, flags, workspace=workspace)
+            flags_modifier.run(path, flags, source_root=source_root, workspace=workspace)
 
         return flags

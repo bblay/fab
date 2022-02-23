@@ -2,17 +2,12 @@
 Gather files from a source folder.
 
 """
-from pathlib import Path
+import logging
 from typing import Optional, List, Tuple
 
 from fab.build_config import PathFilter
-
-from fab.constants import BUILD_OUTPUT
-
 from fab.steps import Step
 from fab.util import file_walk
-
-import logging
 
 logger = logging.getLogger('fab')
 
@@ -20,14 +15,12 @@ logger = logging.getLogger('fab')
 class FindSourceFiles(Step):
 
     def __init__(self,
-                 source_root: Path, output_name="all_source",
-                 build_output: Optional[Path]=None, name="Walk source",
-                 file_filtering: Optional[List[Tuple]]=None):
+                 output_name="all_source",  # todo: artefact output name
+                 name="Walk source",
+                 file_filtering: Optional[List[Tuple]] = None):
 
         super().__init__(name)
-        self.source_root = source_root
         self.output_artefact = output_name
-        self.build_output = build_output or source_root.parent / BUILD_OUTPUT
 
         file_filtering = file_filtering or []
         self.path_filters: List[PathFilter] = [PathFilter(*i) for i in file_filtering]
@@ -41,7 +34,7 @@ class FindSourceFiles(Step):
         """
         super().run(artefacts, config)
 
-        fpaths = list(file_walk(self.source_root))
+        fpaths = list(file_walk(config.source_root))
         if not fpaths:
             raise RuntimeError(f"no source files found")
 
@@ -61,13 +54,14 @@ class FindSourceFiles(Step):
             else:
                 logger.debug(f"excluding {fpath}")
 
-        # create output folders
-        # todo: separate step for folder creation?
-        input_folders = set()
-        for fpath in filtered_fpaths:
-            input_folders.add(fpath.parent.relative_to(self.source_root))
-        for input_folder in input_folders:
-            path = self.build_output / input_folder
-            path.mkdir(parents=True, exist_ok=True)
+        # # create output folders
+        # # todo: separate step for folder creation?
+        # build_output = config.source_root.parent / BUILD_OUTPUT
+        # source_folders = set()
+        # for fpath in filtered_fpaths:
+        #     source_folders.add(fpath.parent.relative_to(config.source_root))
+        # for source_folder in source_folders:
+        #     path = build_output / source_folder
+        #     path.mkdir(parents=True, exist_ok=True)
 
         artefacts[self.output_artefact] = filtered_fpaths
