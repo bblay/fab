@@ -23,7 +23,7 @@ class BuildConfig(object):
         elif os.getenv("FAB_WORKSPACE"):
             fab_workspace_root = os.getenv("FAB_WORKSPACE")
         else:
-            fab_workspace_root = Path("fab-workspace")
+            fab_workspace_root = Path("fab-workspace").absolute()
         self.workspace = fab_workspace_root / (label.replace(' ', '-'))
 
         # source config

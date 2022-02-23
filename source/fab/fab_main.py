@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 
 from fab.constants import SOURCE
 from fab.builder import Build
@@ -23,7 +24,12 @@ def fab_main(config):
         Build(config=config).run()
 
 
-def grab_will_do_this(src_paths, workspace):
+def grab_will_do_this(src_paths, workspace: Path):
+
+    source = workspace / SOURCE
+    if not source.exists():
+        source.mkdir(parents=True, exist_ok=True)
+
     for label, src_path in src_paths:
         # shutil.copytree(
         #     os.path.expanduser(src_path),
@@ -33,5 +39,5 @@ def grab_will_do_this(src_paths, workspace):
         # )
 
         # todo: ignore_patterns('.svn')
-        command = ['rsync', '-ruq', str(os.path.expanduser(src_path)), str(workspace / SOURCE / label)]
+        command = ['rsync', '-ruq', str(os.path.expanduser(src_path)), str(source / label)]
         run_command(command)
