@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from fab.build_config import BuildConfig
-from fab.steps.grab import GrabFolder
+from gcom_build_common import grab_step
 
 
 def gcom_source_config():
@@ -9,12 +9,7 @@ def gcom_source_config():
     Grab the gcom source, for use by multiple rose build configs.
 
     """
-    config = BuildConfig(label='gcom source')
-    config.steps = [
-        GrabFolder(src="/home/h02/bblay/svn/gcom/trunk/build/", dst_label="gcom"),
-    ]
-
-    return config
+    return BuildConfig(label='gcom source', steps=[grab_step()])
 
 
 if __name__ == '__main__':

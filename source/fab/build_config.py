@@ -54,7 +54,8 @@ class BuildConfig(object):
         artefacts = dict()
         for step in self.steps:
             with time_logger(step.name):
-                step.run(artefacts=artefacts, config=self)  # todo: smells like an anti pattern
+                # todo: passing self to a contained object smells like an anti pattern
+                step.run(artefacts=artefacts, config=self)
 
 
 class PathFilter(object):

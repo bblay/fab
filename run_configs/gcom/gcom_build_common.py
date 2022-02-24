@@ -5,6 +5,7 @@ from fab.steps import Step
 from fab.steps.analyse import Analyse
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
+from fab.steps.grab import GrabFolder
 from fab.steps.preprocess import CPreProcessor, FortranPreProcessor
 from fab.steps.walk_source import FindSourceFiles
 
@@ -40,3 +41,7 @@ def common_build_steps(fpic=False) -> List[Step]:
     ]
 
     return steps
+
+
+def grab_step():
+    return GrabFolder(src="/home/h02/bblay/svn/gcom/trunk/build/", dst_name="gcom")

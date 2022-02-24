@@ -14,13 +14,7 @@ def gcom_both_config():
     config = BuildConfig(label='gcom shared and static libraries')
     config.steps = [
         grab_step(),
-
-        # ar
-        *common_build_steps(),
-        ArchiveObjects(archiver='ar', output_fpath='$output/libgcom.a'),
-
-        # so
-        *compilers(fpic=True),
+        *common_build_steps(fpic=True),
         LinkSharedObject(
             linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
             output_fpath='$output/libgcom.so'),

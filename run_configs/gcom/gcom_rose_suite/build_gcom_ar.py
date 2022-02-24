@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import logging
 
 from fab.build_config import BuildConfig
 from fab.steps.archive_objects import ArchiveObjects

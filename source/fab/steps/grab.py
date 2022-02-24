@@ -6,15 +6,16 @@ from fab.steps import Step
 from fab.util import run_command
 
 
+# todo: currently only works  with a trailing slash - address this
 class GrabFolder(Step):
     """
     Step to copy a source folder to the project workspace.
 
     """
-    def __init__(self, src, dst_label, name='grab folder'):
+    def __init__(self, src, dst_name, name='grab folder'):
         super().__init__(name)
         self.src: Path = src
-        self.dst_label: Path = dst_label
+        self.dst_label: Path = dst_name
 
     def run(self, artefacts: Dict, config):
         if not config.source_root.exists():

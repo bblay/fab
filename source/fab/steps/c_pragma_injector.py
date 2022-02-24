@@ -13,6 +13,7 @@ from fab.util import SourceGetter, FilterFpaths
 DEFAULT_SOURCE_GETTER = FilterFpaths('all_source', ['.c'])
 
 
+# todo: "Don't modify the source folder" should be a prime directive. Write these to the output folder instead?
 # todo: test
 class CPragmaInjector(Step):
 

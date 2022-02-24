@@ -1,5 +1,5 @@
 """
-A helper step to copy .inc files to the root of the build source folder, for easy include by the preprocessor.
+A helper step to copy .inc files to the root of the build output for easy include by the preprocessor.
 
 Currently only used for building JULES, .inc files are due to be removed from dev practices,
 at which point this step should be deprecated.
@@ -20,10 +20,11 @@ logger = logging.getLogger('fab')
 
 class RootIncFiles(Step):
 
-    def __init__(self, source_root: Path, build_output: Optional[Path]=None, name="root inc files"):
+    # def __init__(self, source_root: Path, build_output: Optional[Path]=None, name="root inc files"):
+    def __init__(self, name="root inc files"):
         super().__init__(name)
-        self.source_root = source_root
-        self.build_output = build_output or source_root.parent / BUILD_OUTPUT
+        # self.source_root = source_root
+        # self.build_output = build_output or source_root.parent / BUILD_OUTPUT
 
         # warnings.warn("RootIncFiles is deprecated as .inc files are due to be removed.", DeprecationWarning)
 
@@ -37,13 +38,19 @@ class RootIncFiles(Step):
         """
         super().run(artefacts, config)
 
+        # todo: make this a getter calculated by the config?
+        build_output: Path = config.source_root.parent / BUILD_OUTPUT
+        if not build_output.exists():
+            build_output.mkdir(parents=True, exist_ok=True)
+
         # inc files all go in the root - they're going to be removed altogether, soon
         inc_copied = set()
         for fpath in suffix_filter(artefacts["all_source"], [".inc"]):
 
             # don't copy from the output root to the output root!
-            # (i.e ancillary files from a previous run)
-            if fpath.parent == self.build_output:
+            # this is currently unlikely to happen but did in the past, and caused problems.
+            # todo: pretty sure we won't need this anymore
+            if fpath.parent == build_output:
                 continue
 
             # check for name clash
@@ -51,5 +58,5 @@ class RootIncFiles(Step):
                 raise RuntimeError(f"name clash for inc file: {fpath}")
 
             logger.debug(f"copying inc file {fpath}")
-            shutil.copy(fpath, self.build_output)
+            shutil.copy(fpath, build_output)
             inc_copied.add(fpath.name)
