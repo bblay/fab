@@ -26,7 +26,7 @@ class BuildConfig(object):
         if fab_workspace_root:
             fab_workspace_root = Path(fab_workspace_root)
         elif os.getenv("FAB_WORKSPACE"):
-            fab_workspace_root = os.getenv("FAB_WORKSPACE")
+            fab_workspace_root = Path(os.getenv("FAB_WORKSPACE"))
         else:
             fab_workspace_root = Path("fab-workspace").absolute()
         self.workspace = fab_workspace_root / (label.replace(' ', '-'))
@@ -48,7 +48,9 @@ class BuildConfig(object):
         if self.use_multiprocessing:
             logger.info(f"n_procs = {self.n_procs}")
 
+        logger.info(f"workspace is {self.workspace}")
         if not self.workspace.exists():
+            logger.info("creating workspace")
             self.workspace.mkdir(parents=True)
 
         artefacts = dict()

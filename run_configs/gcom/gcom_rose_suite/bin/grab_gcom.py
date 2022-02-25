@@ -9,7 +9,10 @@ print("\n--- grab_gcom.py ---\n")
 print("sys.path", sys.path)
 print("cwd", getcwd())
 print("exe", sys.executable)
-print("user", os.getlogin())
+try:
+    print("user", os.getlogin())
+except Exception as err:
+    print("couldnot get user:", err)
 print("node", os.uname()[1])
 
 # print('CONDA_DEFAULT_ENV', os.environ['CONDA_DEFAULT_ENV'])
