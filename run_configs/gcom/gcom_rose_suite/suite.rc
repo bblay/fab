@@ -1,14 +1,17 @@
 [scheduling]
     [[dependencies]]
-        graph = hello_{{WORLD}}
+        graph = """
+            grab_gcom => build_gcom_ar
+            grab_gcom => build_gcom_so
+        """
 
 [runtime]
-    [[hello_{{WORLD}}]]
-        script = echo "$GREETING {{WORLD}}"
-        [[[job]]]
-            batch system = slurm
-            execution time limit = PT10M
-        [[[directives]]]
-            --mem=500
-            --ntasks=4
-            --export=NONE
+
+    [[grab_gcom]]
+        script = run_py.sh grab_gcom
+
+    [[build_gcom_ar]]
+        script = run_py.sh build_gcom_ar
+
+    [[build_gcom_so]]
+        script = run_py.sh build_gcom_so

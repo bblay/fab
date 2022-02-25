@@ -11,7 +11,7 @@ def gcom_both_config():
     Create both a shared object and an object archive.
 
     """
-    config = BuildConfig(label='gcom shared and static libraries')
+    config = BuildConfig(label='gcom shared library')
     config.steps = [
         grab_step(),
         *common_build_steps(fpic=True),

@@ -2,7 +2,7 @@
 
 import os
 
-from fab.build_config import BuildConfig
+from fab.build_config import BuildConfig, AddFlags
 from fab.steps.analyse import Analyse
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
@@ -30,6 +30,8 @@ def jules_config():
         'diff_atmos_ch4', 'day_calc', 'response', 'radf_ch4', 'gcm_anlg', 'delta_temp', 'rndm', 'invert', 'vgrav',
         'conversions_mod', 'water_constants_mod', 'planet_constants_mod', 'veg_param_mod', 'flake_interface']
 
+    # allow_mismatch_flags = [('*/io/dump/read_dump_mod.f90', ['-fallow-argument-mismatch']),]
+
     config.steps = [
 
         GrabFolder(src='~/svn/jules/trunk/src/', dst_name='src'),
@@ -53,14 +55,19 @@ def jules_config():
         CompileC(),
 
         CompileFortran(
-            compiler=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
+            # compiler=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
+            compiler=os.path.expanduser(os.getenv('GFORTRAN')),
             common_flags=[
                 '-c', '-J', '$output',
                 # '-I', '$output',
+            ],
+            path_flags=[
+                AddFlags('*/io/dump/read_dump_mod.f90', ['-fallow-argument-mismatch'])
             ]),
 
         LinkExe(
             linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
+            # linker=os.path.expanduser(os.getenv('GFORTRAN')),
             output_fpath='$output/jules.exe',
             flags=['-lm']),
     ]
