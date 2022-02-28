@@ -18,7 +18,8 @@ class BuildConfig(object):
 
     def __init__(self, label, source_root=None,
                  fab_workspace_root=None, steps: List[Step]=None,
-                 use_multiprocessing=True, n_procs=max(1, cpu_count() - 1), debug_skip=False):
+                 use_multiprocessing=True, n_procs=None,
+                 debug_skip=False):
 
         self.label = label
 
@@ -37,27 +38,33 @@ class BuildConfig(object):
         # build steps
         self.steps: List[Step] = steps or []  # use default zero-config steps here
 
-        # step run config
+        # multiprocessing config
         self.use_multiprocessing = use_multiprocessing
         self.n_procs = n_procs
+        if self.use_multiprocessing and not self.n_procs:
+            # todo: can we use *all* available cpus, not -1, without causing a bottleneck?
+            self.n_procs = max(1, len(os.sched_getaffinity(0)) - 1)
+
         self.debug_skip = debug_skip
 
     def run(self):
         logger.info(f"{datetime.now()}")
-        logger.info(f"use_multiprocessing = {self.use_multiprocessing}")
         if self.use_multiprocessing:
-            logger.info(f"n_procs = {self.n_procs}")
+            logger.info(f'machine cores: {cpu_count()}')
+            logger.info(f'available cores: {len(os.sched_getaffinity(0))}')
+            logger.info(f'using n_procs = {self.n_procs}')
 
         logger.info(f"workspace is {self.workspace}")
         if not self.workspace.exists():
             logger.info("creating workspace")
             self.workspace.mkdir(parents=True)
 
-        artefacts = dict()
-        for step in self.steps:
-            with time_logger(step.name):
-                # todo: passing self to a contained object smells like an anti pattern
-                step.run(artefacts=artefacts, config=self)
+        with time_logger('running build steps'):
+            artefacts = dict()
+            for step in self.steps:
+                with time_logger(step.name):
+                    # todo: passing self to a contained object smells like an anti pattern
+                    step.run(artefacts=artefacts, config=self)
 
 
 class PathFilter(object):

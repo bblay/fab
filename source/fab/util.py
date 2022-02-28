@@ -1,3 +1,4 @@
+import datetime
 import logging
 import re
 import subprocess
@@ -46,11 +47,25 @@ def file_walk(path: Path) -> Iterator[Path]:
 
 
 @contextmanager
-def time_logger(label):
+def time_logger(label, min_seconds=1):
+    """
+    Immediately logs the name of the activity we are starting, and then later, how long it took.
+
+    Args:
+        - label:        Name of the activity we are timing.
+        - min_seconds:  Don't log the timingif it's trivially quick.
+
+    """
     logger.info("\n" + label)
     start = perf_counter()
     yield None
-    logger.info(f"{label} took {perf_counter() - start}")
+
+    # don't bother reporting trivial timings
+    seconds = int(perf_counter() - start)
+    if seconds >= min_seconds:
+        # convert to timedelta for human-friendly str()
+        td = datetime.timedelta(seconds=seconds)
+        logger.info(f"{label} took {td}")
 
 
 # todo: better as a named tuple?

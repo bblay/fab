@@ -54,8 +54,9 @@ class LinkExe(Step):
 
         output_fpath = Template(self.output_fpath).substitute(output=config.workspace / BUILD_OUTPUT)
         if self._config.debug_skip and Path(output_fpath).exists():
-            log_or_dot(logger, f'LinkExe skipping: {output_fpath}')
+            logger.info(f'Link skipping {output_fpath}')
             return self.output_fpath
+        logger.info(f'Linking {output_fpath}')
 
         command.extend(['-o', output_fpath])
         command.extend([str(a.output_fpath) for a in compiled_files])
