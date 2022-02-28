@@ -13,7 +13,7 @@ from typing import Iterator, List, Iterable, Dict
 from fab.constants import BUILD_OUTPUT, SOURCE
 
 logger = logging.getLogger('fab')
-logger.addHandler(logging.StreamHandler(sys.stderr))
+logger.addHandler(logging.StreamHandler(sys.stdout))
 
 
 def log_or_dot(logger, msg):

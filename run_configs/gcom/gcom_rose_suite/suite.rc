@@ -13,7 +13,8 @@
             execution time limit = PT10M
         [[[directives]]]
             --mem=500
-            --ntasks=4
+#           --ntasks=4
+            --cpus-per-task=4
             --export=NONE
         [[[environment]]]
             FAB_WORKSPACE=$SCRATCH/fab_workspace

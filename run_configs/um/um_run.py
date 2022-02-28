@@ -8,8 +8,9 @@ import os
 import warnings
 from pathlib import Path
 
+from fab.steps.grab import GrabFolder
+
 from fab.build_config import AddFlags, BuildConfig
-from fab.builder import Build
 from fab.constants import SOURCE, BUILD_OUTPUT
 from fab.dep_tree import AnalysedFile
 from fab.steps import Step
@@ -36,22 +37,30 @@ from fab.util import time_logger, case_insensitive_replace, Artefact, run_comman
 # batch manager assigns resources
 
 
-def um_atmos_safe_config(fab_workspace_root=None):
+def um_atmos_safe_config():
     config = BuildConfig(
         label='um_atmos_safe',
-        fab_workspace_root=fab_workspace_root,
         # use_multiprocessing=False,
-        debug_skip=True,
+        # debug_skip=True,
     )
 
-    # todo: make grab a step?
-    config.grab_config = {
-        ("um", "~/svn/um/trunk/src/"),
-        ("jules", "~/svn/jules/trunk/src/"),
-        ("socrates", "~/svn/socrates/trunk/src/"),
-        ("shumlib", "~/svn/shumlib/trunk/"),
-        ("casim", "~/svn/casim/src/"),
-    }
+    # # todo: make grab a step?
+    # config.grab_config = {
+    #     ("um", "~/svn/um/trunk/src/"),
+    #     ("jules", "~/svn/jules/trunk/src/"),
+    #     ("socrates", "~/svn/socrates/trunk/src/"),
+    #     ("shumlib", "~/svn/shumlib/trunk/"),
+    #     ("casim", "~/svn/casim/src/"),
+    # }
+
+    # from gcom_build_ar import gcom_ar_config
+    # gcom_location = os.getenv('GCOM_BUILD', None) or gcom_ar_config().workspace
+
+    # gcom_build = os.getenv('GCOM_BUILD', None) or \
+    #              os.path.normpath(os.path.join(config.workspace, '../gcom_object-archive'))
+
+    gcom_build = os.getenv('GCOM_BUILD') or \
+                 os.path.expanduser("~/git/fab/run_configs/gcom/fab-workspace/gcom-static-library/build_output")
 
     file_filtering = [
         (['/um/utility/'], False),
@@ -105,11 +114,18 @@ def um_atmos_safe_config(fab_workspace_root=None):
 
     config.steps = [
 
+        # todo: create a mp GrabFolders step?
+        GrabFolder(src='~/svn/um/trunk/src/', dst_name='um'),
+        GrabFolder(src='~/svn/jules/trunk/src/', dst_name='jules'),
+        GrabFolder(src='~/svn/socrates/trunk/src/', dst_name='socrates'),
+        GrabFolder(src='~/svn/shumlib/trunk/', dst_name='shumlib'),
+        GrabFolder(src='~/svn/casim/src/', dst_name='casim'),
+
         MyCustomCodeFixes(name="my custom code fixes"),
 
-        FindSourceFiles(source_root=config.workspace / SOURCE, file_filtering=file_filtering),  # template?
+        FindSourceFiles(file_filtering=file_filtering),  # template?
 
-        RootIncFiles(config.workspace / SOURCE),
+        RootIncFiles(),
 
         CPragmaInjector(),
 
@@ -178,9 +194,12 @@ def um_atmos_safe_config(fab_workspace_root=None):
                 # mpl include - todo: just add this for everything?
                 # todo: Whatever's building um should perhaps also be building gcom in the same place.
                 #       So don't hardcode the gcom path here? Perhaps pass it into the config?
-                AddFlags(f"$output/um/*", ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
+                AddFlags(f"$output/um/*",
+                         # ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
+                         ['-I', gcom_build]),
                 AddFlags(f"$output/jules/*",
-                         ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
+                         # ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
+                         ['-I', gcom_build]),
 
                 # todo: allow multiple filters per instance?
                 *[AddFlags(*i) for i in ALLOW_MISMATCH_FLAGS]
@@ -195,7 +214,7 @@ def um_atmos_safe_config(fab_workspace_root=None):
             linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
             flags=[
                 '-lc', '-lgfortran', '-L', '~/.conda/envs/sci-fab/lib',
-                '-L', os.path.expanduser('~/git/fab/tmp-workspace/gcom/build_output'), '-l', 'gcom'
+                '-L', gcom_build, '-l', 'gcom'
             ],
             output_fpath='um_atmos.exe')
     ]
@@ -249,19 +268,8 @@ ALLOW_MISMATCH_FLAGS = [
 def main():
     logger = logging.getLogger('fab')
     # logger.setLevel(logging.DEBUG)
-    logger.setLevel(logging.INFO)
 
-    # config
-    config = um_atmos_safe_config(fab_workspace_root='/tmp/persistent/fab_workspace')
-
-    builder = Build(config=config)
-
-    # Get source repos
-    with time_logger("grabbing"):
-        grab_will_do_this(config.grab_config, config.workspace)
-
-    with time_logger("um build"):
-        builder.run()
+    um_atmos_safe_config().run()
 
 
 ### helper stuff to eventually throw away below here ###
