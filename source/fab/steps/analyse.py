@@ -260,7 +260,7 @@ class Analyse(Step):
                 unchanged.append(prev_pu)
 
         for suffix, to_analyse in changed.items():
-            logger.info(f"{len(unchanged)} {suffix} files already analysed, {len(to_analyse)} to analyse")
+            logger.info(f"{len(to_analyse)} {suffix} to analyse")
 
         return changed, unchanged
 

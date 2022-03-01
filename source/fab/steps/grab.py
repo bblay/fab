@@ -12,8 +12,8 @@ class GrabFolder(Step):
     Step to copy a source folder to the project workspace.
 
     """
-    def __init__(self, src, dst_name, name='grab folder'):
-        super().__init__(name)
+    def __init__(self, src, dst_name, name=None):
+        super().__init__(f'grab folder {src}')
         self.src: Path = src
         self.dst_label: Path = dst_name
 

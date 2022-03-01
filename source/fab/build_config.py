@@ -59,7 +59,7 @@ class BuildConfig(object):
             logger.info("creating workspace")
             self.workspace.mkdir(parents=True)
 
-        with time_logger('running build steps'):
+        with time_logger(f'running {self.label} build steps'):
             artefacts = dict()
             for step in self.steps:
                 with time_logger(step.name):

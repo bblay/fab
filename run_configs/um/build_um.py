@@ -41,7 +41,7 @@ def um_atmos_safe_config():
     config = BuildConfig(
         label='um_atmos_safe',
         # use_multiprocessing=False,
-        # debug_skip=True,
+        debug_skip=True,
     )
 
     # # todo: make grab a step?
@@ -262,32 +262,6 @@ ALLOW_MISMATCH_FLAGS = [
 ]
 
 
-# todo: import and run the gcom build script here?
-
-
-def main():
-    logger = logging.getLogger('fab')
-    # logger.setLevel(logging.DEBUG)
-
-    um_atmos_safe_config().run()
-
-
-### helper stuff to eventually throw away below here ###
-
-
-def grab_will_do_this(src_paths, workspace):
-    for label, src_path in src_paths:
-        # shutil.copytree(
-        #     os.path.expanduser(src_path),
-        #     workspace / SOURCE_ROOT / label,
-        #     dirs_exist_ok=True,
-        #     ignore=shutil.ignore_patterns('.svn')
-        # )
-
-        command = ['rsync', '-ruq', str(os.path.expanduser(src_path)), str(workspace / SOURCE / label)]
-        run_command(command)
-
-
 class MyCustomCodeFixes(Step):
     """
     An example of a custom step to fix some source code which fparser2 can't parse.
@@ -314,4 +288,7 @@ class MyCustomCodeFixes(Step):
 
 
 if __name__ == '__main__':
-    main()
+    logger = logging.getLogger('fab')
+    # logger.setLevel(logging.DEBUG)
+
+    um_atmos_safe_config().run()

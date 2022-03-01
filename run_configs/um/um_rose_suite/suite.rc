@@ -17,7 +17,7 @@
             --export=NONE
         [[[environment]]]
             FAB_WORKSPACE=$SCRATCH/fab_workspace
-            GCOM_BUILD=$FAB_WORKSPACE/gcom-object-archive/build_output
+            GCOM_BUILD=$SCRATCH/fab_workspace/gcom-object-archive/build_output
 
     [[build_um]]
         inherit = common
