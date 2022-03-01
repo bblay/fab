@@ -3,6 +3,7 @@ Link an executable.
 
 """
 import logging
+import os
 from pathlib import Path
 from string import Template
 from typing import List
@@ -23,7 +24,7 @@ class LinkExe(Step):
 
     """
 
-    def __init__(self, linker: str, output_fpath: str, flags=None, source: SourceGetter = None, name='link exe'):
+    def __init__(self, linker: str, output_fpath, flags=None, source: SourceGetter = None, name='link exe'):
         """
         Args:
             - linker: E.g 'gcc' or 'ld'.
@@ -37,7 +38,7 @@ class LinkExe(Step):
         self.source_getter = source or DEFAULT_SOURCE_GETTER
         self.linker = linker
         self.flags: List[str] = flags or []
-        self.output_fpath = output_fpath
+        self.output_fpath: str = str(output_fpath)
 
     def run(self, artefacts, config):
         """
@@ -52,7 +53,8 @@ class LinkExe(Step):
 
         command = [self.linker]
 
-        output_fpath = Template(self.output_fpath).substitute(output=config.workspace / BUILD_OUTPUT)
+        output_fpath = Template(self.output_fpath).substitute(output=str(config.workspace / BUILD_OUTPUT))
+        output_fpath = os.path.abspath(output_fpath)
         if self._config.debug_skip and Path(output_fpath).exists():
             logger.info(f'Link skipping {output_fpath}')
             return self.output_fpath

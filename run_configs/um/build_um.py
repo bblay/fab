@@ -8,21 +8,20 @@ import os
 import warnings
 from pathlib import Path
 
-from fab.steps.grab import GrabFolder
-
 from fab.build_config import AddFlags, BuildConfig
-from fab.constants import SOURCE, BUILD_OUTPUT
+from fab.constants import BUILD_OUTPUT
 from fab.dep_tree import AnalysedFile
 from fab.steps import Step
 from fab.steps.analyse import Analyse
 from fab.steps.c_pragma_injector import CPragmaInjector
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
+from fab.steps.grab import GrabFolder
 from fab.steps.link_exe import LinkExe
 from fab.steps.preprocess import FortranPreProcessor, CPreProcessor
 from fab.steps.root_inc_files import RootIncFiles
 from fab.steps.walk_source import FindSourceFiles
-from fab.util import time_logger, case_insensitive_replace, Artefact, run_command
+from fab.util import case_insensitive_replace, Artefact
 
 
 # hierarchy of config
@@ -41,7 +40,7 @@ def um_atmos_safe_config():
     config = BuildConfig(
         label='um_atmos_safe',
         # use_multiprocessing=False,
-        debug_skip=True,
+        # debug_skip=True,
     )
 
     # # todo: make grab a step?
@@ -216,7 +215,7 @@ def um_atmos_safe_config():
                 '-lc', '-lgfortran', '-L', '~/.conda/envs/sci-fab/lib',
                 '-L', gcom_build, '-l', 'gcom'
             ],
-            output_fpath='um_atmos.exe')
+            output_fpath=config.workspace / 'um_atmos.exe')
     ]
 
     return config
