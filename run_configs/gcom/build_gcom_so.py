@@ -8,7 +8,7 @@ from gcom_build_common import common_build_steps, compilers, grab_step
 
 def gcom_both_config():
     """
-    Create both a shared object and an object archive.
+    Create a shared object for linking.
 
     """
     config = BuildConfig(label='gcom shared library')

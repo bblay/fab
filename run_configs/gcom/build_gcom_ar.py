@@ -5,7 +5,7 @@ from gcom_build_common import common_build_steps, grab_step
 
 def gcom_ar_config():
     """
-    Create both a shared object and an object archive.
+    Create an object archive for linking.
 
     """
     config = BuildConfig(label='gcom static library')

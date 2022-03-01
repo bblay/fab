@@ -9,7 +9,7 @@ from grab_gcom import gcom_source_config
 
 def gcom_so_config():
     """
-    Create a shared object library for dynamic linking.
+    Create a shared object for linking.
 
     """
     config = BuildConfig(label='gcom shared object', source_root=gcom_source_config().source_root)
