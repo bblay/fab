@@ -1,4 +1,5 @@
 import multiprocessing
+from multiprocessing.connection import Connection
 from typing import Dict
 
 
@@ -14,6 +15,8 @@ class Step(object):
     """
     def __init__(self, name):
         self.name = name
+        self._config = None
+        self._metrics_send_conn = None
 
     # todo: it is the responsibility of all steps, which produce an output file from an input file,
     #       to ensure the output file path is translated from possibly being in the source folder,
@@ -24,7 +27,8 @@ class Step(object):
     # todo: too much to send the whole config through?
     #       it allows step manipulation, adding steps, etc
     #       but it could let things get into a mess? discuss...
-    def run(self, artefacts: Dict, config):
+    # todo: make metrics connection optional, for easier testing/exploratory coding?
+    def run(self, artefacts: Dict, config, metrics_send_conn: Connection):
         """
         Process some input artefacts, create some output artefacts. Defined by the subclass.
 
@@ -32,6 +36,7 @@ class Step(object):
             - artefacts: Build artefacts created by previous Steps, to which we add our new artefacts.
             - config: :class:`fab.config.Config`, where we can access runtime config, such as workspace
                       and multiprocessing flags.
+            - metrics_send_conn: Pass any metrics to this via send_metric().
 
         Subclasses should be sure to describe their input and output artefacts.
 
@@ -40,8 +45,13 @@ class Step(object):
         In this case, we don't want to also pass the config, so setting it here makes it available to all our methods.
         Because it's a runtime attribute, we don't show it in the constructor. (Discuss?)
 
+        This is also true for the metrics_send_connection; a Pipe connection for sending metrics data.
+
         """
+
+        # todo: ideally there'd be some automatic cleanup of these when run has finished, but that seems low priority.
         self._config = config
+        self._metrics_send_conn = metrics_send_conn
 
     def run_mp(self, items, func):
         """

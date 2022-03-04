@@ -6,6 +6,7 @@ import sys
 import zlib
 from collections import namedtuple
 from contextlib import contextmanager
+from multiprocessing.connection import Connection
 from pathlib import Path
 from time import perf_counter
 from typing import Iterator, List, Iterable, Dict
@@ -46,26 +47,54 @@ def file_walk(path: Path) -> Iterator[Path]:
             yield i
 
 
-@contextmanager
-def time_logger(label, min_seconds=1):
+class Timer(object):
     """
-    Immediately logs the name of the activity we are starting, and then later, how long it took.
-
-    Args:
-        - label:        Name of the activity we are timing.
-        - min_seconds:  Don't log the timingif it's trivially quick.
+    A simple timing context manager.
 
     """
-    logger.info("\n" + label)
-    start = perf_counter()
-    yield None
+    def __init__(self):
+        self._start = None
+        self.taken = None
 
-    # don't bother reporting trivial timings
-    seconds = int(perf_counter() - start)
-    if seconds >= min_seconds:
-        # convert to timedelta for human-friendly str()
-        td = datetime.timedelta(seconds=seconds)
-        logger.info(f"{label} took {td}")
+    def __enter__(self):
+        self._start = perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.taken = perf_counter() - self._start
+
+
+class TimerLogger(object):
+    """
+    A labelled timing context manager which logs the label and the time taken.
+
+    """
+    def __init__(self, label, min_seconds=1):
+        self.label = label
+        self.min_seconds = min_seconds
+
+        self._start = None
+        self.taken = None
+
+    def __enter__(self):
+        logger.info("\n" + self.label)
+        self._start = perf_counter()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.taken = perf_counter() - self._start
+
+        # log the time taken
+        # don't bother reporting trivial timings
+        seconds = int(self.taken)
+        if seconds >= self.min_seconds:
+            # convert to timedelta for human-friendly str()
+            td = datetime.timedelta(seconds=seconds)
+            logger.info(f"{self.label} took {td}")
+
+
+def send_metric(metrics_send_conn: Connection, group: str, name: str, value):
+    metrics_send_conn.send([group, name, value])
 
 
 # todo: better as a named tuple?

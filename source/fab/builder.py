@@ -11,7 +11,7 @@ from pathlib import Path
 
 from fab.build_config import BuildConfig
 
-from fab.util import time_logger
+from fab.util import TimerLogger
 
 logger = logging.getLogger('fab')
 

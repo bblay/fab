@@ -40,14 +40,14 @@ class LinkExe(Step):
         self.flags: List[str] = flags or []
         self.output_fpath: str = str(output_fpath)
 
-    def run(self, artefacts, config):
+    def run(self, artefacts, config, metrics_send_conn):
         """
         Links all the object files in the *compiled_c* and *compiled_fortran* artefacts.
 
         (Current thinking) does not create an entry in the artefacts dict.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         compiled_files = self.source_getter(artefacts)
 

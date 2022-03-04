@@ -23,12 +23,12 @@ class CPragmaInjector(Step):
         self.source_getter = source or DEFAULT_SOURCE_GETTER
         self.output_name = output_name
 
-    def run(self, artefacts: Dict, config):
+    def run(self, artefacts: Dict, config, metrics_send_conn):
         """
         By default, reads .c files from the *all_source* artefact and creates the *pragmad_c* artefact.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         files = self.source_getter(artefacts)
         results = self.run_mp(items=files, func=self._process_artefact)

@@ -25,14 +25,14 @@ class FindSourceFiles(Step):
         file_filtering = file_filtering or []
         self.path_filters: List[PathFilter] = [PathFilter(*i) for i in file_filtering]
 
-    def run(self, artefacts, config):
+    def run(self, artefacts, config, metrics_send_conn):
         """
         Get all files in the folder and subfolders.
 
         Requires no artefacts, creates the "all_source" artefact.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         fpaths = list(file_walk(config.source_root))
         if not fpaths:

@@ -17,7 +17,9 @@ class GrabFolder(Step):
         self.src: Path = src
         self.dst_label: Path = dst_name
 
-    def run(self, artefacts: Dict, config):
+    def run(self, artefacts: Dict, config, metrics_send_conn):
+        super().run(artefacts, config, metrics_send_conn)
+
         if not config.source_root.exists():
             config.source_root.mkdir(parents=True, exist_ok=True)
 

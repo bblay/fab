@@ -9,7 +9,8 @@ from typing import List, Set
 from fab.dep_tree import AnalysedFile, by_type
 
 from fab.steps.mp_exe import MpExeStep
-from fab.util import CompiledFile, log_or_dot_finish, log_or_dot, run_command, FilterBuildTree, SourceGetter
+from fab.util import CompiledFile, log_or_dot_finish, log_or_dot, run_command, FilterBuildTree, SourceGetter, Timer, \
+    send_metric
 
 logger = logging.getLogger('fab')
 
@@ -24,14 +25,14 @@ class CompileFortran(MpExeStep):
         super().__init__(exe=compiler, common_flags=common_flags, path_flags=path_flags, name=name)
         self.source_getter = source or DEFAULT_SOURCE_GETTER
 
-    def run(self, artefacts, config):
+    def run(self, artefacts, config, metrics_send_conn):
         """
         Compiles all Fortran files in the *build_tree* artefact, creating the *compiled_c* artefact.
 
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         to_compile = self.source_getter(artefacts)
         logger.info(f"\ncompiling {len(to_compile)} fortran files")
@@ -110,22 +111,25 @@ class CompileFortran(MpExeStep):
         return compile_next
 
     def compile_file(self, analysed_file: AnalysedFile):
-        command = [self.exe]
-        command.extend(self.flags.flags_for_path(
-            analysed_file.fpath, source_root=self._config.source_root, workspace=self._config.workspace))
-        command.append(str(analysed_file.fpath))
+        with Timer() as timer:
+            command = [self.exe]
+            command.extend(self.flags.flags_for_path(
+                analysed_file.fpath, source_root=self._config.source_root, workspace=self._config.workspace))
+            command.append(str(analysed_file.fpath))
 
-        output_fpath = analysed_file.fpath.with_suffix('.o')
-        if self._config.debug_skip and output_fpath.exists():
-            log_or_dot(logger, f'Compiler skipping: {analysed_file.fpath}')
-            return CompiledFile(analysed_file, output_fpath)
+            output_fpath = analysed_file.fpath.with_suffix('.o')
+            if self._config.debug_skip and output_fpath.exists():
+                log_or_dot(logger, f'Compiler skipping: {analysed_file.fpath}')
+                return CompiledFile(analysed_file, output_fpath)
 
-        command.extend(['-o', str(output_fpath)])
+            command.extend(['-o', str(output_fpath)])
 
-        log_or_dot(logger, 'Compiler running command: ' + ' '.join(command))
-        try:
-            run_command(command)
-        except Exception as err:
-            return Exception("Error calling compiler:", err)
+            log_or_dot(logger, 'Compiler running command: ' + ' '.join(command))
+            try:
+                run_command(command)
+            except Exception as err:
+                return Exception("Error calling compiler:", err)
+
+        send_metric(self._metrics_send_conn, self.name, str(analysed_file.fpath), timer.taken)
 
         return CompiledFile(analysed_file, output_fpath)

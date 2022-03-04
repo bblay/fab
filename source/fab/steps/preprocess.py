@@ -44,14 +44,14 @@ class PreProcessor(MpExeStep):
         self.output_artefact = output_artefact or self.DEFAULT_OUTPUT_NAME
         self.output_suffix = output_suffix or self.DEFAULT_OUTPUT_SUFFIX
 
-    def run(self, artefacts, config):
+    def run(self, artefacts, config, metrics_send_conn):
         """
         Preprocess all input files from `self.source_getter`, creating `self.output_artefact`.
 
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         files = self.source_getter(artefacts)
         results = self.run_mp(items=files, func=self.process_artefact)

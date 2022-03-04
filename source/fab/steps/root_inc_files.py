@@ -28,7 +28,7 @@ class RootIncFiles(Step):
 
         # warnings.warn("RootIncFiles is deprecated as .inc files are due to be removed.", DeprecationWarning)
 
-    def run(self, artefacts, config):
+    def run(self, artefacts, config, metrics_send_conn):
         """
         Copy inc files into the workspace output root.
 
@@ -36,7 +36,7 @@ class RootIncFiles(Step):
         It's up to the user to configure other tools to find these files.
 
         """
-        super().run(artefacts, config)
+        super().run(artefacts, config, metrics_send_conn)
 
         # todo: make this a getter calculated by the config?
         build_output: Path = config.source_root.parent / BUILD_OUTPUT
