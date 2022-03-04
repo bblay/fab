@@ -43,21 +43,7 @@ def um_atmos_safe_config():
         # debug_skip=True,
     )
 
-    # # todo: make grab a step?
-    # config.grab_config = {
-    #     ("um", "~/svn/um/trunk/src/"),
-    #     ("jules", "~/svn/jules/trunk/src/"),
-    #     ("socrates", "~/svn/socrates/trunk/src/"),
-    #     ("shumlib", "~/svn/shumlib/trunk/"),
-    #     ("casim", "~/svn/casim/src/"),
-    # }
-
-    # from gcom_build_ar import gcom_ar_config
-    # gcom_location = os.getenv('GCOM_BUILD', None) or gcom_ar_config().workspace
-
-    # gcom_build = os.getenv('GCOM_BUILD', None) or \
-    #              os.path.normpath(os.path.join(config.workspace, '../gcom_object-archive'))
-
+    # locate the gcom library
     gcom_build = os.getenv('GCOM_BUILD') or \
                  os.path.expanduser("~/git/fab/run_configs/gcom/fab-workspace/gcom-static-library/build_output")
 
@@ -182,35 +168,32 @@ def um_atmos_safe_config():
         CompileC(compiler='gcc', common_flags=['-c', '-std=c99']),
 
         CompileFortran(
-            compiler=os.path.expanduser('~/.conda/envs/sci-fab/bin/gfortran'),
+            # todo: GFORTRAN ENV VAR
+            # compiler='mpifort',
+            compiler='gfortran',
             common_flags=[
                 '-fdefault-integer-8', '-fdefault-real-8', '-fdefault-double-8',
                 '-c',
                 '-J', '$output',  # .mod file output and include folder
+                # '-O2'
             ],
 
             path_flags=[
                 # mpl include - todo: just add this for everything?
-                # todo: Whatever's building um should perhaps also be building gcom in the same place.
-                #       So don't hardcode the gcom path here? Perhaps pass it into the config?
-                AddFlags(f"$output/um/*",
-                         # ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
-                         ['-I', gcom_build]),
-                AddFlags(f"$output/jules/*",
-                         # ['-I', os.path.expanduser("~/git/fab/tmp-workspace/gcom/build_output")]),
-                         ['-I', gcom_build]),
+                AddFlags(f"$output/um/*", ['-I', gcom_build]),
+                AddFlags(f"$output/jules/*", ['-I', gcom_build]),
 
                 # todo: allow multiple filters per instance?
                 *[AddFlags(*i) for i in ALLOW_MISMATCH_FLAGS]
             ]
         ),
 
-        # todo: ArchiveObjects(),
+        # todo: ArchiveObjects() first? If nothing else, it makes linker error messages more manageable.
 
         #
         LinkExe(
             # linker='gcc',
-            linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
+            linker='mpifort',
             flags=[
                 '-lc', '-lgfortran', '-L', '~/.conda/envs/sci-fab/lib',
                 '-L', gcom_build, '-l', 'gcom'

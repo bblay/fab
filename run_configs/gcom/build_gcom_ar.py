@@ -1,6 +1,6 @@
 from fab.build_config import BuildConfig
-from fab.steps.archive_objects import ArchiveObjects
-from gcom_build_common import common_build_steps, grab_step
+
+from gcom_build_steps import common_build_steps, grab_step, object_archive_step
 
 
 def gcom_ar_config():
@@ -12,8 +12,7 @@ def gcom_ar_config():
     config.steps = [
         grab_step(),
         *common_build_steps(),
-        ArchiveObjects(archiver='ar', output_fpath='$output/libgcom.a'),
-
+        object_archive_step(),
     ]
 
     return config

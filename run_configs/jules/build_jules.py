@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-
+import logging
 import os
 
 from fab.build_config import BuildConfig, AddFlags
@@ -16,9 +16,11 @@ from fab.steps.walk_source import FindSourceFiles
 def jules_config():
     config = BuildConfig(label='Jules Build')
     # config.use_multiprocessing = False
-    config.debug_skip = True
+    # config.debug_skip = True
 
-    # os.environ['OMPI_FC'] = 'gfortran'
+    # log this env var, which is important for mpifort
+    logger = logging.getLogger('fab')
+    logger.info(f"OMPI_FC is {os.environ.get('OMPI_FC') or 'not defined'}")
 
     # A big list of symbols which are used in jules without a use statement.
     # Fab doesn't automatically identify such dependencies, and so they must be specified here by the user.
@@ -55,19 +57,14 @@ def jules_config():
         CompileC(),
 
         CompileFortran(
-            # compiler=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
-            compiler=os.path.expanduser(os.getenv('GFORTRAN')),
-            common_flags=[
-                '-c', '-J', '$output',
-                # '-I', '$output',
-            ],
+            compiler='gfortran',
+            common_flags=['-c', '-J', '$output'],
             path_flags=[
                 AddFlags('*/io/dump/read_dump_mod.f90', ['-fallow-argument-mismatch'])
             ]),
 
         LinkExe(
-            linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
-            # linker=os.path.expanduser(os.getenv('GFORTRAN')),
+            linker='mpifort',
             output_fpath='$output/jules.exe',
             flags=['-lm']),
     ]

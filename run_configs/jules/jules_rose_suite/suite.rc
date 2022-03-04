@@ -1,13 +1,14 @@
 [scheduling]
     [[dependencies]]
         graph = """
-            grab_gcom => build_gcom_ar
-            grab_gcom => build_gcom_so
+            build_jules
         """
 
 [runtime]
 
-    [[common]]
+    [[build_jules]]
+        script = run_py.sh build_jules
+
         [[[job]]]
             batch system = slurm
             execution time limit = PT10M
@@ -19,15 +20,3 @@
         [[[environment]]]
             FAB_WORKSPACE=$SCRATCH/fab_workspace
             OMPI_FC=gfortran
-
-    [[grab_gcom]]
-        inherit = common
-        script = run_py.sh grab_gcom
-
-    [[build_gcom_ar]]
-        inherit = common
-        script = run_py.sh build_gcom_ar
-
-    [[build_gcom_so]]
-        inherit = common
-        script = run_py.sh build_gcom_so

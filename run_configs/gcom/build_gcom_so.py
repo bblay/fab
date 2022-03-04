@@ -1,9 +1,7 @@
-import os
-
 from fab.build_config import BuildConfig
-from fab.steps.archive_objects import ArchiveObjects
-from fab.steps.link_exe import LinkSharedObject
-from gcom_build_common import common_build_steps, compilers, grab_step
+
+from gcom_build_steps import common_build_steps, grab_step
+from run_configs.gcom.gcom_build_steps import link_shared_object_step
 
 
 def gcom_both_config():
@@ -15,9 +13,7 @@ def gcom_both_config():
     config.steps = [
         grab_step(),
         *common_build_steps(fpic=True),
-        LinkSharedObject(
-            linker=os.path.expanduser('~/.conda/envs/sci-fab/bin/mpifort'),
-            output_fpath='$output/libgcom.so'),
+        link_shared_object_step(),
     ]
 
     return config

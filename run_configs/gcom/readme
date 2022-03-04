@@ -1,6 +1,7 @@
 todo:
 
+We've put the gcom build steps into reusable code, for use by the various build scripts.
+
 content:
-    rose suite for building on spice
+    rose suites for building on spice
     standalone scripts for building locally
-    config code reuse
