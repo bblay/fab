@@ -16,7 +16,7 @@ class Step(object):
     def __init__(self, name):
         self.name = name
         self._config = None
-        self._metrics_send_conn = None
+        self._metric_send_conn = None
 
     # todo: it is the responsibility of all steps, which produce an output file from an input file,
     #       to ensure the output file path is translated from possibly being in the source folder,

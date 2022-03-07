@@ -8,30 +8,30 @@ from typing import Optional
 
 logger = logging.getLogger('fab')
 
-_metrics_recv_conn: Optional[Connection] = None
-_metrics_send_conn: Optional[Connection] = None
-_metric_read_process: Optional[Process] = None
+_metric_recv_conn: Optional[Connection] = None
+_metric_send_conn: Optional[Connection] = None
+_metric_recv_process: Optional[Process] = None
 
 
-def init_metrics():
-    global _metrics_recv_conn, _metrics_send_conn, _metric_read_process
+def init_metrics(workspace):
+    global _metric_recv_conn, _metric_send_conn, _metric_recv_process
 
-    _metrics_recv_conn, _metrics_send_conn = Pipe(duplex=False)
+    _metric_recv_conn, _metric_send_conn = Pipe(duplex=False)
 
     # start a recording process
-    _metric_read_process = Process(target=read_metric, args=(_metrics_recv_conn,))
-    _metric_read_process.start()
+    _metric_recv_process = Process(target=read_metric, args=(_metric_recv_conn, workspace))
+    _metric_recv_process.start()
 
 
-def read_metric(metrics_recv_conn):
+def read_metric(metrics_recv_conn, workspace):
     metrics = defaultdict(dict)
 
     # todo: do this better
-    # we run in a subprocess, so we get a copy of _metrics_send_conn before it closes.
+    # we run in a subprocess, so we get a copy of _metric_send_conn before it closes.
     # when the calling process finally does close it, we'll still have an open copy of it,
     # so the connection will still be considered open!
     # therefore we close *OUR* copy of it now.
-    _metrics_send_conn.close()
+    _metric_send_conn.close()
 
     logger.info('read_metric: waiting for metrics')
     num_recorded = 0
@@ -54,33 +54,34 @@ def read_metric(metrics_recv_conn):
 
     logger.info(f"read_metric: recorded {num_recorded} metrics")
 
-    metrics_summary(metrics)
+    metrics_summary(metrics, workspace)
 
 
 def send_metric(group: str, name: str, value):
     # called from subprocesses
-    _metrics_send_conn.send([group, name, value])
+    _metric_send_conn.send([group, name, value])
 
 
 def stop_metrics():
-    _metrics_send_conn.close()
-    _metric_read_process.join(10)
-    logger.info(f"_metric_read_process exit code = {_metric_read_process.exitcode}")
+    _metric_send_conn.close()
+    _metric_recv_process.join(10)
+    logger.info(f"_metric_recv_process exit code = {_metric_recv_process.exitcode}")
 
 
-def metrics_summary(metrics):
+def metrics_summary(metrics, workspace):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
 
     logger.info(f'metrics_summary: got metrics for: {metrics.keys()}')
 
-    Path('metrics').mkdir(exist_ok=True)
+    metrics_folder = Path(workspace) / "metrics"
+    metrics_folder.mkdir(exist_ok=True)
 
     things = ['preprocess fortran', 'preprocess c', 'compile fortran']
     for thing in things:
 
-        fbase = os.path.join("metrics", thing.replace(' ', '_'))
+        fbase = metrics_folder / thing.replace(' ', '_')
 
         plt.hist(metrics[thing].values(), 10)
         plt.savefig(f"{fbase}.png")
@@ -93,5 +94,5 @@ def metrics_summary(metrics):
                 txt_file.write(f"{i}\n")
 
     plt.pie(metrics['steps'].values(), labels=metrics['steps'].keys(), normalize=True)
-    plt.savefig("metrics/pie.png")
+    plt.savefig(metrics_folder / "pie.png")
     plt.close()

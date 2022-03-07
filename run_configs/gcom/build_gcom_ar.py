@@ -1,5 +1,4 @@
 from fab.build_config import BuildConfig
-from fab.metrics import metrics_summary
 from gcom_build_steps import common_build_steps, grab_step, object_archive_step
 
 

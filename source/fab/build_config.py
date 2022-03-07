@@ -66,7 +66,7 @@ class BuildConfig(object):
 
         artefacts = dict()
         # metrics_recv_conn, metrics_send_conn = multiprocessing.Pipe(duplex=False)
-        init_metrics()
+        init_metrics(self.workspace)
         # metrics_queue = multiprocessing.Queue()
 
         with TimerLogger(f'running {self.label} build steps'):
