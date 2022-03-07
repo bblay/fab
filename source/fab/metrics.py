@@ -1,19 +1,12 @@
 import logging
 import os
 from collections import defaultdict
-from multiprocessing.connection import Connection
 from multiprocessing import Process, Pipe
+from multiprocessing.connection import Connection
 from pathlib import Path
-
-# import matplotlib
-# matplotlib.use('Agg')
-# import matplotlib.pyplot as plt
 from typing import Optional
 
 logger = logging.getLogger('fab')
-
-
-_metrics = defaultdict(dict)
 
 _metrics_recv_conn: Optional[Connection] = None
 _metrics_send_conn: Optional[Connection] = None
@@ -31,8 +24,9 @@ def init_metrics():
 
 
 def read_metric(metrics_recv_conn):
-    global _metrics
+    metrics = defaultdict(dict)
 
+    # todo: do this better
     # we run in a subprocess, so we get a copy of _metrics_send_conn before it closes.
     # when the calling process finally does close it, we'll still have an open copy of it,
     # so the connection will still be considered open!
@@ -55,12 +49,12 @@ def read_metric(metrics_recv_conn):
             break
 
         group, name, value = metric
-        _metrics[group][name] = value
+        metrics[group][name] = value
         num_recorded += 1
 
     logger.info(f"read_metric: recorded {num_recorded} metrics")
 
-    metrics_summary()
+    metrics_summary(metrics)
 
 
 def send_metric(group: str, name: str, value):
@@ -74,13 +68,12 @@ def stop_metrics():
     logger.info(f"_metric_read_process exit code = {_metric_read_process.exitcode}")
 
 
-def metrics_summary():
-
+def metrics_summary(metrics):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
 
-    logger.info(f'metrics_summary: got metrics for: {_metrics.keys()}')
+    logger.info(f'metrics_summary: got metrics for: {metrics.keys()}')
 
     Path('metrics').mkdir(exist_ok=True)
 
@@ -89,16 +82,16 @@ def metrics_summary():
 
         fbase = os.path.join("metrics", thing.replace(' ', '_'))
 
-        plt.hist(_metrics[thing].values(), 10)
+        plt.hist(metrics[thing].values(), 10)
         plt.savefig(f"{fbase}.png")
         plt.close()
 
-        top_ten = sorted(_metrics[thing].items(), key=lambda kv: kv[1], reverse=True)[:10]
+        top_ten = sorted(metrics[thing].items(), key=lambda kv: kv[1], reverse=True)[:10]
         with open(f"{fbase}.txt", "wt") as txt_file:
             txt_file.write("top ten\n")
             for i in top_ten:
                 txt_file.write(f"{i}\n")
 
-    plt.pie(_metrics['steps'].values(), labels=_metrics['steps'].keys(), normalize=True)
+    plt.pie(metrics['steps'].values(), labels=metrics['steps'].keys(), normalize=True)
     plt.savefig("metrics/pie.png")
     plt.close()
