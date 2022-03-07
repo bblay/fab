@@ -25,14 +25,14 @@ class CompileC(MpExeStep):
         super().__init__(exe=compiler, common_flags=common_flags, path_flags=path_flags, name=name)
         self.source_getter = source or DEFAULT_SOURCE_GETTER
 
-    def run(self, artefacts, config, metrics_send_conn):
+    def run(self, artefacts, config):
         """
         Compiles all C files in the *build_tree* artefact, creating the *compiled_c* artefact.
 
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config, metrics_send_conn)
+        super().run(artefacts, config)
 
         to_compile = self.source_getter(artefacts)
         logger.info(f"compiling {len(to_compile)} c files")

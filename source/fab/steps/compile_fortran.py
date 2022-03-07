@@ -6,11 +6,12 @@ import logging
 from pathlib import Path
 from typing import List, Set
 
+from fab.metrics import send_metric
+
 from fab.dep_tree import AnalysedFile, by_type
 
 from fab.steps.mp_exe import MpExeStep
-from fab.util import CompiledFile, log_or_dot_finish, log_or_dot, run_command, FilterBuildTree, SourceGetter, Timer, \
-    send_metric
+from fab.util import CompiledFile, log_or_dot_finish, log_or_dot, run_command, FilterBuildTree, SourceGetter, Timer
 
 logger = logging.getLogger('fab')
 
@@ -25,14 +26,14 @@ class CompileFortran(MpExeStep):
         super().__init__(exe=compiler, common_flags=common_flags, path_flags=path_flags, name=name)
         self.source_getter = source or DEFAULT_SOURCE_GETTER
 
-    def run(self, artefacts, config, metrics_send_conn):
+    def run(self, artefacts, config):
         """
         Compiles all Fortran files in the *build_tree* artefact, creating the *compiled_c* artefact.
 
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config, metrics_send_conn)
+        super().run(artefacts, config)
 
         to_compile = self.source_getter(artefacts)
         logger.info(f"\ncompiling {len(to_compile)} fortran files")
@@ -130,6 +131,6 @@ class CompileFortran(MpExeStep):
             except Exception as err:
                 return Exception("Error calling compiler:", err)
 
-        send_metric(self._metrics_send_conn, self.name, str(analysed_file.fpath), timer.taken)
+        send_metric(self.name, str(analysed_file.fpath), timer.taken)
 
         return CompiledFile(analysed_file, output_fpath)

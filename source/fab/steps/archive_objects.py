@@ -33,7 +33,7 @@ class ArchiveObjects(Step):
         self.archiver = archiver
         self.output_fpath = output_fpath
 
-    def run(self, artefacts: Dict, config, metrics_send_conn):
+    def run(self, artefacts: Dict, config):
         """
         Creates an archive object from the *compiled_c* and *compiled_fortran* artefacts.
 
@@ -41,7 +41,7 @@ class ArchiveObjects(Step):
         is responsible for managing which files are passed to the linker.
 
         """
-        super().run(artefacts, config, metrics_send_conn)
+        super().run(artefacts, config)
 
         compiled_files: List[CompiledFile] = self.source_getter(artefacts)
 

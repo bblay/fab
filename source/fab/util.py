@@ -5,8 +5,6 @@ import subprocess
 import sys
 import zlib
 from collections import namedtuple
-from contextlib import contextmanager
-from multiprocessing.connection import Connection
 from pathlib import Path
 from time import perf_counter
 from typing import Iterator, List, Iterable, Dict
@@ -91,10 +89,6 @@ class TimerLogger(object):
             # convert to timedelta for human-friendly str()
             td = datetime.timedelta(seconds=seconds)
             logger.info(f"{self.label} took {td}")
-
-
-def send_metric(metrics_send_conn: Connection, group: str, name: str, value):
-    metrics_send_conn.send([group, name, value])
 
 
 # todo: better as a named tuple?

@@ -1,16 +1,17 @@
 import logging
 import os
-from collections import defaultdict
 from datetime import datetime
 from fnmatch import fnmatch
-from multiprocessing import cpu_count, Pipe
+import multiprocessing
+from multiprocessing import cpu_count
 from string import Template
 from pathlib import Path
-from typing import List, Set
+from typing import List
 
 from fab.constants import BUILD_OUTPUT, SOURCE
+from fab.metrics import send_metric, init_metrics, stop_metrics
 from fab.steps import Step
-from fab.util import TimerLogger, send_metric
+from fab.util import TimerLogger
 
 logger = logging.getLogger('fab')
 
@@ -40,13 +41,21 @@ class BuildConfig(object):
         self.steps: List[Step] = steps or []  # use default zero-config steps here
 
         # multiprocessing config
-        self.use_multiprocessing = multiprocessing
+        self.multiprocessing = multiprocessing
         self.n_procs = n_procs
-        if self.use_multiprocessing and not self.n_procs:
+        if self.multiprocessing and not self.n_procs:
             # todo: can we use *all* available cpus, not -1, without causing a bottleneck?
             self.n_procs = max(1, len(os.sched_getaffinity(0)) - 1)
 
         self.debug_skip = debug_skip
+
+    def logging_header(self):
+        logger.info(f"{datetime.now()}")
+        if self.multiprocessing:
+            logger.info(f'machine cores: {cpu_count()}')
+            logger.info(f'available cores: {len(os.sched_getaffinity(0))}')
+            logger.info(f'using n_procs = {self.n_procs}')
+        logger.info(f"workspace is {self.workspace}")
 
     def run(self):
         self.logging_header()
@@ -56,39 +65,23 @@ class BuildConfig(object):
             self.workspace.mkdir(parents=True)
 
         artefacts = dict()
-        metrics_recv_conn, metrics_send_conn = Pipe(duplex=False)
+        # metrics_recv_conn, metrics_send_conn = multiprocessing.Pipe(duplex=False)
+        init_metrics()
+        # metrics_queue = multiprocessing.Queue()
 
         with TimerLogger(f'running {self.label} build steps'):
 
             # todo: passing self to a contained object smells like an anti pattern
             for step in self.steps:
                 with TimerLogger(step.name) as step_timer:
-                    step.run(artefacts=artefacts, config=self, metrics_send_conn=metrics_send_conn)
-                send_metric(metrics_send_conn, 'steps', step.name, step_timer.taken)
+                    step.run(artefacts=artefacts, config=self)
+                send_metric('steps', step.name, step_timer.taken)
 
-            # read the metrics from the pipe
-            return self.collate_metrics(metrics_recv_conn)
+        # metrics_send_conn.close()
+        stop_metrics()
 
-    def collate_metrics(self, metrics_recv_conn):
-        logger.info('metric results')
-
-        metrics = defaultdict(dict)
-
-        while metrics_recv_conn.poll(timeout=1):
-            metric = metrics_recv_conn.recv()
-            group, name, value = metric
-            metrics[group][name] = value
-            # logger.info(str(metric))
-
-        return metrics
-
-    def logging_header(self):
-        logger.info(f"{datetime.now()}")
-        if self.use_multiprocessing:
-            logger.info(f'machine cores: {cpu_count()}')
-            logger.info(f'available cores: {len(os.sched_getaffinity(0))}')
-            logger.info(f'using n_procs = {self.n_procs}')
-        logger.info(f"workspace is {self.workspace}")
+        # # read the metrics from the pipe
+        # return collate_metrics(metrics_send_conn)
 
 
 class PathFilter(object):

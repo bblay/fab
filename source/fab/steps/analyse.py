@@ -63,7 +63,7 @@ class Analyse(Step):
         self.fortran_analyser = FortranAnalyser(std=std)
         self.c_analyser = CAnalyser()
 
-    def run(self, artefacts, config, metrics_send_conn):
+    def run(self, artefacts, config):
         """
         Creates the *build_tree* artefact: Dict[Path, AnalysedFile] from the files in `self.source_getter`.
 
@@ -78,7 +78,7 @@ class Analyse(Step):
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config, metrics_send_conn)
+        super().run(artefacts, config)
 
         files = self.source_getter(artefacts)
 

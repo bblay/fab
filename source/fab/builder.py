@@ -76,30 +76,3 @@ def entry() -> None:
     #                   skip_files=skip_files,
     #                   unreferenced_deps=unreferenced_deps)
     # application.run(arguments.source.split(','))
-
-
-# class Build(object):
-#     def __init__(self, config: BuildConfig):
-#         self.config = config
-#
-#         # if not config.workspace.exists():
-#         #     config.workspace.mkdir(parents=True)
-#
-#         # if not (config.workspace / BUILD_OUTPUT).exists():
-#         #     (config.workspace / BUILD_OUTPUT).mkdir()
-#         # if not (config.workspace / SOURCE).exists():
-#         #     (config.workspace / SOURCE).mkdir()
-#
-#     def run(self):
-#         logger.info(f"{datetime.now()}")
-#         logger.info(f"use_multiprocessing = {self.config.use_multiprocessing}")
-#         if self.config.use_multiprocessing:
-#             logger.info(f"n_procs = {self.config.n_procs}")
-#
-#         if not self.config.workspace.exists():
-#             self.config.workspace.mkdir(parents=True)
-#
-#         artefacts = dict()
-#         for step in self.config.steps:
-#             with time_logger(step.name):
-#                 step.run(artefacts, self.config)

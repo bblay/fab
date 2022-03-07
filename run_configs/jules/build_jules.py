@@ -15,7 +15,7 @@ from fab.steps.walk_source import FindSourceFiles
 
 def jules_config():
     config = BuildConfig(label='Jules Build')
-    # config.use_multiprocessing = False
+    # config.multiprocessing = False
     # config.debug_skip = True
 
     # log this env var, which is important for mpifort

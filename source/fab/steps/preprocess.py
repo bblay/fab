@@ -6,10 +6,13 @@ import logging
 from pathlib import Path
 from typing import List
 
+from fab.metrics import send_metric
+
 from fab.dep_tree import by_type
 
 from fab.steps.mp_exe import MpExeStep
-from fab.util import log_or_dot_finish, input_to_output_fpath, log_or_dot, run_command, SourceGetter, FilterFpaths
+from fab.util import log_or_dot_finish, input_to_output_fpath, log_or_dot, run_command, SourceGetter, FilterFpaths, \
+    Timer
 
 logger = logging.getLogger('fab')
 
@@ -44,14 +47,14 @@ class PreProcessor(MpExeStep):
         self.output_artefact = output_artefact or self.DEFAULT_OUTPUT_NAME
         self.output_suffix = output_suffix or self.DEFAULT_OUTPUT_SUFFIX
 
-    def run(self, artefacts, config, metrics_send_conn):
+    def run(self, artefacts, config):
         """
         Preprocess all input files from `self.source_getter`, creating `self.output_artefact`.
 
         This step uses multiprocessing, unless disabled in the :class:`~fab.steps.Step` class.
 
         """
-        super().run(artefacts, config, metrics_send_conn)
+        super().run(artefacts, config)
 
         files = self.source_getter(artefacts)
         results = self.run_mp(items=files, func=self.process_artefact)
@@ -75,31 +78,34 @@ class PreProcessor(MpExeStep):
         Writes the output file to the output folder, with a lower case extension.
 
         """
-        output_fpath = input_to_output_fpath(
-            source_root=self._config.source_root,
-            workspace=self._config.workspace, input_path=fpath).with_suffix(self.output_suffix)
+        with Timer() as timer:
+            output_fpath = input_to_output_fpath(
+                source_root=self._config.source_root,
+                workspace=self._config.workspace, input_path=fpath).with_suffix(self.output_suffix)
 
-        # for dev speed, but this could become a good time saver with, e.g, hashes or something
-        if self._config.debug_skip and output_fpath.exists():
-            log_or_dot(logger, f'Preprocessor skipping: {fpath}')
-            return output_fpath
+            # for dev speed, but this could become a good time saver with, e.g, hashes or something
+            if self._config.debug_skip and output_fpath.exists():
+                log_or_dot(logger, f'Preprocessor skipping: {fpath}')
+                return output_fpath
 
-        if not output_fpath.parent.exists():
-            output_fpath.parent.mkdir(parents=True, exist_ok=True)
+            if not output_fpath.parent.exists():
+                output_fpath.parent.mkdir(parents=True, exist_ok=True)
 
-        command = [self.exe]
-        command.extend(self.flags.flags_for_path(
-            fpath, source_root=self._config.source_root, workspace=self._config.workspace))
+            command = [self.exe]
+            command.extend(self.flags.flags_for_path(
+                fpath, source_root=self._config.source_root, workspace=self._config.workspace))
 
-        # input and output files
-        command.append(str(fpath))
-        command.append(str(output_fpath))
+            # input and output files
+            command.append(str(fpath))
+            command.append(str(output_fpath))
 
-        log_or_dot(logger, 'PreProcessor running command: ' + ' '.join(command))
-        try:
-            run_command(command)
-        except Exception as err:
-            raise Exception(f"error preprocessing {fpath}: {err}")
+            log_or_dot(logger, 'PreProcessor running command: ' + ' '.join(command))
+            try:
+                run_command(command)
+            except Exception as err:
+                raise Exception(f"error preprocessing {fpath}: {err}")
+
+        send_metric(self.name, str(fpath), timer.taken)
 
         return output_fpath
 

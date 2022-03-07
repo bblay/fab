@@ -13,12 +13,12 @@ class GrabFolder(Step):
 
     """
     def __init__(self, src, dst_name, name=None):
-        super().__init__(f'grab folder {src}')
+        super().__init__(name or f'grab folder {dst_name}')
         self.src: Path = src
         self.dst_label: Path = dst_name
 
-    def run(self, artefacts: Dict, config, metrics_send_conn):
-        super().run(artefacts, config, metrics_send_conn)
+    def run(self, artefacts: Dict, config):
+        super().run(artefacts, config)
 
         if not config.source_root.exists():
             config.source_root.mkdir(parents=True, exist_ok=True)
