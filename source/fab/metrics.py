@@ -100,7 +100,8 @@ def metrics_summary(workspace):
 
         plt.hist(values, 10)
         plt.suptitle(f'{step_name} histogram\n'
-                     f'{len(values)} files took {total_time} on {metrics["run"]["datetime"]}')
+                     f'{len(values)} files took {total_time}')
+        plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
         plt.xlabel('time (s)')
         plt.savefig(f"{fbase}.png")
         plt.close()
@@ -122,7 +123,8 @@ def metrics_summary(workspace):
     time_taken = datetime.timedelta(seconds=int(run['time taken']))
 
     plt.suptitle(f"{run['label']} took {time_taken}\n"
-                 f"on {run['sysname']}, {run['nodename']}, {run['machine']}, {metrics['run']['datetime']}")
+                 f"on {run['sysname']}, {run['nodename']}, {run['machine']}")
+    plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
 
     plt.savefig(metrics_folder / "pie.png")
     plt.close()
