@@ -1,3 +1,4 @@
+import datetime
 import logging
 from collections import defaultdict
 from multiprocessing import Process, Pipe
@@ -88,21 +89,40 @@ def metrics_summary(workspace):
     metrics_folder = Path(workspace) / "metrics"
     metrics_folder.mkdir(exist_ok=True)
 
-    things = ['preprocess fortran', 'preprocess c', 'compile fortran']
-    for thing in things:
+    # graphs for individual steps
+    step_names = ['preprocess fortran', 'preprocess c', 'compile fortran']
+    for step_name in step_names:
 
-        fbase = metrics_folder / thing.replace(' ', '_')
+        fbase = metrics_folder / step_name.replace(' ', '_')
 
-        plt.hist(metrics[thing].values(), 10)
+        values = metrics[step_name].values()
+        total_time = datetime.timedelta(seconds=int(metrics["steps"][step_name]))
+
+        plt.hist(values, 10)
+        plt.suptitle(f'{step_name} histogram\n'
+                     f'{len(values)} files took {total_time} on {metrics["run"]["datetime"]}')
+        plt.xlabel('time (s)')
         plt.savefig(f"{fbase}.png")
         plt.close()
 
-        top_ten = sorted(metrics[thing].items(), key=lambda kv: kv[1], reverse=True)[:10]
+        top_ten = sorted(metrics[step_name].items(), key=lambda kv: kv[1], reverse=True)[:10]
         with open(f"{fbase}.txt", "wt") as txt_file:
             txt_file.write("top ten\n")
             for i in top_ten:
                 txt_file.write(f"{i}\n")
 
-    plt.pie(metrics['steps'].values(), labels=metrics['steps'].keys(), normalize=True)
+    # overall pie chart of time taken by each step
+    step_metrics = metrics['steps'].items()
+    step_times = [kv[1] for kv in step_metrics]
+    step_labels = [kv[0] for kv in step_metrics]
+    plt.pie(step_times, labels=step_labels, normalize=True,
+            wedgeprops={"linewidth": 1, "edgecolor": "white"})
+
+    run = metrics['run']
+    time_taken = datetime.timedelta(seconds=int(run['time taken']))
+
+    plt.suptitle(f"{run['label']} took {time_taken}\n"
+                 f"on {run['sysname']}, {run['nodename']}, {run['machine']}, {metrics['run']['datetime']}")
+
     plt.savefig(metrics_folder / "pie.png")
     plt.close()

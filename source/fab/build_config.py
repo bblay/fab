@@ -1,3 +1,4 @@
+import getpass
 import logging
 import os
 from datetime import datetime
@@ -58,6 +59,7 @@ class BuildConfig(object):
         logger.info(f"workspace is {self.workspace}")
 
     def run(self):
+        start_time = datetime.now().replace(microsecond=0)
         self.logging_header()
 
         if not self.workspace.exists():
@@ -69,13 +71,21 @@ class BuildConfig(object):
         init_metrics()
         # metrics_queue = multiprocessing.Queue()
 
-        with TimerLogger(f'running {self.label} build steps'):
+        with TimerLogger(f'running {self.label} build steps') as steps_timer:
 
             # todo: passing self to a contained object smells like an anti pattern
             for step in self.steps:
                 with TimerLogger(step.name) as step_timer:
                     step.run(artefacts=artefacts, config=self)
                 send_metric('steps', step.name, step_timer.taken)
+
+        send_metric('run', 'label', self.label)
+        send_metric('run', 'datetime', start_time.isoformat())
+        send_metric('run', 'time taken', steps_timer.taken)
+        send_metric('run', 'sysname', os.uname().sysname)
+        send_metric('run', 'nodename', os.uname().nodename)
+        send_metric('run', 'machine', os.uname().machine)
+        send_metric('run', 'user', getpass.getuser())
 
         # metrics_send_conn.close()
         stop_metrics()
