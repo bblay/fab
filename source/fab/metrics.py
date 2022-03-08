@@ -79,9 +79,13 @@ def stop_metrics():
 
 
 def metrics_summary(workspace):
-    import matplotlib
-    matplotlib.use('Agg')
-    import matplotlib.pyplot as plt
+
+    try:
+        import matplotlib
+        matplotlib.use('Agg')
+        import matplotlib.pyplot as plt
+    except ImportError:
+        plt = None
 
     metrics = _all_metrics_recv_conn.recv()
 
@@ -102,13 +106,14 @@ def metrics_summary(workspace):
         values = metrics[step_name].values()
         total_time = datetime.timedelta(seconds=int(metrics["steps"][step_name]))
 
-        plt.hist(values, 10)
-        plt.suptitle(f'{step_name} histogram\n'
-                     f'{len(values)} files took {total_time}')
-        plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
-        plt.xlabel('time (s)')
-        plt.savefig(f"{fbase}.png")
-        plt.close()
+        if plt:
+            plt.hist(values, 10)
+            plt.suptitle(f'{step_name} histogram\n'
+                         f'{len(values)} files took {total_time}')
+            plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
+            plt.xlabel('time (s)')
+            plt.savefig(f"{fbase}.png")
+            plt.close()
 
         top_ten = sorted(metrics[step_name].items(), key=lambda kv: kv[1], reverse=True)[:10]
         with open(f"{fbase}.txt", "wt") as txt_file:
@@ -117,18 +122,17 @@ def metrics_summary(workspace):
                 txt_file.write(f"{i}\n")
 
     # overall pie chart of time taken by each step
-    step_metrics = metrics['steps'].items()
-    step_times = [kv[1] for kv in step_metrics]
-    step_labels = [kv[0] for kv in step_metrics]
-    plt.pie(step_times, labels=step_labels, normalize=True,
-            wedgeprops={"linewidth": 1, "edgecolor": "white"})
+    if plt:
+        run = metrics['run']
+        time_taken = datetime.timedelta(seconds=int(run['time taken']))
+        step_metrics = metrics['steps'].items()
+        step_times = [kv[1] for kv in step_metrics]
+        step_labels = [kv[0] for kv in step_metrics]
 
-    run = metrics['run']
-    time_taken = datetime.timedelta(seconds=int(run['time taken']))
-
-    plt.suptitle(f"{run['label']} took {time_taken}\n"
-                 f"on {run['sysname']}, {run['nodename']}, {run['machine']}")
-    plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
-
-    plt.savefig(metrics_folder / "pie.png")
-    plt.close()
+        plt.pie(step_times, labels=step_labels, normalize=True,
+                wedgeprops={"linewidth": 1, "edgecolor": "white"})
+        plt.suptitle(f"{run['label']} took {time_taken}\n"
+                     f"on {run['sysname']}, {run['nodename']}, {run['machine']}")
+        plt.figtext(0.99, 0.01, f"{metrics['run']['datetime']}", horizontalalignment='right', fontsize='x-small')
+        plt.savefig(metrics_folder / "pie.png")
+        plt.close()
