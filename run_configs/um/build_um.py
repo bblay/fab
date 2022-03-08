@@ -24,16 +24,7 @@ from fab.steps.walk_source import FindSourceFiles
 from fab.util import case_insensitive_replace, Artefact
 
 
-# hierarchy of config
-#
-# site (sys admin)
-# project (source code)
-# overrides
-# blocked overrides
-#
-# what ought to inherit from env
-# num cores in submit script, mem
-# batch manager assigns resources
+# todo: fail fast, check gcom exists
 
 
 def um_atmos_safe_config():
@@ -45,7 +36,8 @@ def um_atmos_safe_config():
 
     # locate the gcom library
     gcom_build = os.getenv('GCOM_BUILD') or \
-                 os.path.expanduser("~/git/fab/run_configs/gcom/fab-workspace/gcom-static-library/build_output")
+                 os.path.expanduser(config.workspace / "../gcom-static-library/build_output")
+
 
     file_filtering = [
         (['/um/utility/'], False),

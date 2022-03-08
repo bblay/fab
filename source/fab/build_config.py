@@ -33,6 +33,7 @@ class BuildConfig(object):
             fab_workspace_root = Path(os.getenv("FAB_WORKSPACE"))
         else:
             fab_workspace_root = Path("fab-workspace").absolute()
+            logger.info("FAB_WORKSPACE not set. Using cwd.")
         self.workspace = fab_workspace_root / (label.replace(' ', '-'))
 
         # source config
@@ -71,28 +72,26 @@ class BuildConfig(object):
         init_metrics()
         # metrics_queue = multiprocessing.Queue()
 
-        with TimerLogger(f'running {self.label} build steps') as steps_timer:
+        try:
+            with TimerLogger(f'running {self.label} build steps') as steps_timer:
+                for step in self.steps:
+                    with TimerLogger(step.name) as step_timer:
+                        step.run(artefacts=artefacts, config=self)  # todo: smells like an anti pattern
+                    send_metric('steps', step.name, step_timer.taken)
+        except Exception as err:
+            logger.error(f'error running build steps: {err}')
+        finally:
+            send_metric('run', 'label', self.label)
+            send_metric('run', 'datetime', start_time.isoformat())
+            send_metric('run', 'time taken', steps_timer.taken)
+            send_metric('run', 'sysname', os.uname().sysname)
+            send_metric('run', 'nodename', os.uname().nodename)
+            send_metric('run', 'machine', os.uname().machine)
+            send_metric('run', 'user', getpass.getuser())
 
-            # todo: passing self to a contained object smells like an anti pattern
-            for step in self.steps:
-                with TimerLogger(step.name) as step_timer:
-                    step.run(artefacts=artefacts, config=self)
-                send_metric('steps', step.name, step_timer.taken)
-
-        send_metric('run', 'label', self.label)
-        send_metric('run', 'datetime', start_time.isoformat())
-        send_metric('run', 'time taken', steps_timer.taken)
-        send_metric('run', 'sysname', os.uname().sysname)
-        send_metric('run', 'nodename', os.uname().nodename)
-        send_metric('run', 'machine', os.uname().machine)
-        send_metric('run', 'user', getpass.getuser())
-
-        # metrics_send_conn.close()
-        stop_metrics()
-        metrics_summary(self.workspace)
-
-        # # read the metrics from the pipe
-        # return collate_metrics(metrics_send_conn)
+            # metrics_send_conn.close()
+            stop_metrics()
+            metrics_summary(self.workspace)
 
 
 class PathFilter(object):
