@@ -1,4 +1,5 @@
 import datetime
+import json
 import logging
 from collections import defaultdict
 from multiprocessing import Process, Pipe
@@ -88,6 +89,9 @@ def metrics_summary(workspace):
 
     metrics_folder = Path(workspace) / "metrics"
     metrics_folder.mkdir(exist_ok=True)
+
+    with open(metrics_folder / 'metrics.json', 'wt') as outfile:
+        json.dump(metrics, outfile, indent='\t')
 
     # graphs for individual steps
     step_names = ['preprocess fortran', 'preprocess c', 'compile fortran']
