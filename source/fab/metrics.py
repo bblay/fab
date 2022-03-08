@@ -50,7 +50,7 @@ def read_metric(metric_recv_conn: Connection, all_metrics_send_conn: Connection)
         try:
             metric = metric_recv_conn.recv()
         except EOFError:
-            logger.info('read_metric: nd of metrics')
+            # logger.info('read_metric: end of metrics')
             break
         except Exception:
             logger.info('read_metric: unhandled error receiving metrics')
@@ -74,7 +74,7 @@ def send_metric(group: str, name: str, value):
 def stop_metrics():
     _metric_send_conn.close()
     _metric_recv_process.join(1)
-    logger.info(f"_metric_recv_process exit code = {_metric_recv_process.exitcode}")
+    # logger.info(f"_metric_recv_process exit code = {_metric_recv_process.exitcode}")
 
 
 def metrics_summary(workspace):
