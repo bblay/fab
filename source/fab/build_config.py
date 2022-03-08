@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import List
 
 from fab.constants import BUILD_OUTPUT, SOURCE
-from fab.metrics import send_metric, init_metrics, stop_metrics
+from fab.metrics import send_metric, init_metrics, stop_metrics, metrics_summary
 from fab.steps import Step
 from fab.util import TimerLogger
 
@@ -66,7 +66,7 @@ class BuildConfig(object):
 
         artefacts = dict()
         # metrics_recv_conn, metrics_send_conn = multiprocessing.Pipe(duplex=False)
-        init_metrics(self.workspace)
+        init_metrics()
         # metrics_queue = multiprocessing.Queue()
 
         with TimerLogger(f'running {self.label} build steps'):
@@ -79,6 +79,7 @@ class BuildConfig(object):
 
         # metrics_send_conn.close()
         stop_metrics()
+        metrics_summary(self.workspace)
 
         # # read the metrics from the pipe
         # return collate_metrics(metrics_send_conn)

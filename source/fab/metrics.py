@@ -1,5 +1,4 @@
 import logging
-import os
 from collections import defaultdict
 from multiprocessing import Process, Pipe
 from multiprocessing.connection import Connection
@@ -8,22 +7,32 @@ from typing import Optional
 
 logger = logging.getLogger('fab')
 
+# the pipe connections for individual metrics
 _metric_recv_conn: Optional[Connection] = None
 _metric_send_conn: Optional[Connection] = None
+
+# the process which receives individual metrics
 _metric_recv_process: Optional[Process] = None
 
+# the pipe connection for receiving the collated metrics, once they've stopped being sent
+_all_metrics_recv_conn: Optional[Connection] = None
 
-def init_metrics(workspace):
-    global _metric_recv_conn, _metric_send_conn, _metric_recv_process
 
+def init_metrics():
+    global _metric_recv_conn, _metric_send_conn, _metric_recv_process, _all_metrics_recv_conn
+
+    # the pipe connections for individual metrics
     _metric_recv_conn, _metric_send_conn = Pipe(duplex=False)
 
-    # start a recording process
-    _metric_recv_process = Process(target=read_metric, args=(_metric_recv_conn, workspace))
+    # the pipe connections for the collated metrics, once they've stopped being sent
+    _all_metrics_recv_conn, all_metrics_send_conn = Pipe(duplex=False)
+
+    # start the receiving process
+    _metric_recv_process = Process(target=read_metric, args=(_metric_recv_conn, all_metrics_send_conn))
     _metric_recv_process.start()
 
 
-def read_metric(metrics_recv_conn, workspace):
+def read_metric(metric_recv_conn: Connection, all_metrics_send_conn: Connection):
     metrics = defaultdict(dict)
 
     # todo: do this better
@@ -38,9 +47,7 @@ def read_metric(metrics_recv_conn, workspace):
     while True:
 
         try:
-            metric = metrics_recv_conn.recv()
-            # logger.info(f'got metric {metric}')
-            # logger.info(f'metrics for {_metrics.keys()}')
+            metric = metric_recv_conn.recv()
         except EOFError:
             logger.info('read_metric: nd of metrics')
             break
@@ -54,24 +61,27 @@ def read_metric(metrics_recv_conn, workspace):
 
     logger.info(f"read_metric: recorded {num_recorded} metrics")
 
-    metrics_summary(metrics, workspace)
+    # send the collated metrics
+    all_metrics_send_conn.send(metrics)
+    all_metrics_send_conn.close()
 
 
 def send_metric(group: str, name: str, value):
-    # called from subprocesses
     _metric_send_conn.send([group, name, value])
 
 
 def stop_metrics():
     _metric_send_conn.close()
-    _metric_recv_process.join(10)
+    _metric_recv_process.join(1)
     logger.info(f"_metric_recv_process exit code = {_metric_recv_process.exitcode}")
 
 
-def metrics_summary(metrics, workspace):
+def metrics_summary(workspace):
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
+
+    metrics = _all_metrics_recv_conn.recv()
 
     logger.info(f'metrics_summary: got metrics for: {metrics.keys()}')
 
