@@ -6,7 +6,8 @@ from fab.build_config import BuildConfig, AddFlags
 from fab.steps.analyse import Analyse
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
-from fab.steps.grab import GrabFolder
+# from fab.steps.grab import GrabFolder
+from fab.steps.grab import GrabSvn
 from fab.steps.link_exe import LinkExe
 from fab.steps.preprocess import CPreProcessor, FortranPreProcessor
 from fab.steps.root_inc_files import RootIncFiles
@@ -34,14 +35,20 @@ def jules_config():
 
     # allow_mismatch_flags = [('*/io/dump/read_dump_mod.f90', ['-fallow-argument-mismatch']),]
 
+    # revision = "21398"  # this one compiles
+    revision = "r22411"  # release 6.3, feb 28 2022
     config.steps = [
 
-        GrabFolder(src='~/svn/jules/trunk/src/', dst_label='src'),
-        GrabFolder(src='~/svn/jules/trunk/utils/', dst_label='util'),
+        # GrabFolder(src='~/svn/jules/trunk/src/', dst_label='src'),
+        # GrabFolder(src='~/svn/jules/trunk/utils/', dst_label='util'),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/jules/main/trunk/src/', dst_label='src', revision=revision),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/jules/main/trunk/utils/', dst_label='utils', revision=revision),
 
         FindSourceFiles(file_filtering=[
             (['src/control/um/'], False),
             (['src/initialisation/um/'], False),
+            (['src/control/rivers-standalone/'], False),
+            (['src/initialisation/rivers-standalone/'], False),
             (['src/params/shared/cable_maths_constants_mod.F90'], False)]),
 
         RootIncFiles(),

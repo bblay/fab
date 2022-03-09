@@ -16,7 +16,7 @@ from fab.steps.analyse import Analyse
 from fab.steps.c_pragma_injector import CPragmaInjector
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
-from fab.steps.grab import GrabFolder
+from fab.steps.grab import GrabSvn
 from fab.steps.link_exe import LinkExe
 from fab.steps.preprocess import FortranPreProcessor, CPreProcessor
 from fab.steps.root_inc_files import RootIncFiles
@@ -56,8 +56,10 @@ def um_atmos_safe_config():
         (['/jules/'], False),
         (['/jules/control/shared/',
           '/jules/control/um/',
+          '/jules/control/rivers-standalone/',
           '/jules/initialisation/shared/',
           '/jules/initialisation/um/',
+          '/jules/initialisation/rivers-standalone/',
           '/jules/params/um/',
           '/jules/science/',
           '/jules/util/shared/'], True),
@@ -92,11 +94,17 @@ def um_atmos_safe_config():
     config.steps = [
 
         # todo: create a mp GrabFolders step?
-        GrabFolder(src='~/svn/um/trunk/src/', dst_label='um'),
-        GrabFolder(src='~/svn/jules/trunk/src/', dst_label='jules'),
-        GrabFolder(src='~/svn/socrates/trunk/src/', dst_label='socrates'),
-        GrabFolder(src='~/svn/shumlib/trunk/', dst_label='shumlib'),
-        GrabFolder(src='~/svn/casim/src/', dst_label='casim'),
+        # GrabFolder(src='~/svn/um/trunk/src/', dst_label='um'),
+        # GrabFolder(src='~/svn/jules/trunk/src/', dst_label='jules'),
+        # GrabFolder(src='~/svn/socrates/trunk/src/', dst_label='socrates'),
+        # GrabFolder(src='~/svn/shumlib/trunk/', dst_label='shumlib'),
+        # GrabFolder(src='~/svn/casim/src/', dst_label='casim'),
+
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/um/main/trunk/src/', dst_label='um'),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/jules/main/trunk/src/', dst_label='jules', revision='r22411'),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/socrates/main/trunk/src/', dst_label='socrates'),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/utils/shumlib/trunk/', dst_label='shumlib'),
+        GrabSvn(src='https://code.metoffice.gov.uk/svn/monc/casim/trunk/src/', dst_label='casim'),
 
         MyCustomCodeFixes(name="my custom code fixes"),
 
