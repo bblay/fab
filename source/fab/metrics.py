@@ -61,7 +61,7 @@ def read_metric(metric_recv_conn: Connection, all_metrics_send_conn: Connection)
         metrics[group][name] = value
         num_recorded += 1
 
-    logger.info(f"read_metric: recorded {num_recorded} metrics")
+    logger.debug(f"read_metric: recorded {num_recorded} metrics")
 
     # send the collated metrics
     all_metrics_send_conn.send(metrics)
@@ -89,7 +89,7 @@ def metrics_summary(workspace):
 
     metrics = _all_metrics_recv_conn.recv()
 
-    logger.info(f'metrics_summary: got metrics for: {metrics.keys()}')
+    logger.debug(f'metrics_summary: got metrics for: {metrics.keys()}')
 
     metrics_folder = Path(workspace) / "metrics"
     metrics_folder.mkdir(exist_ok=True)

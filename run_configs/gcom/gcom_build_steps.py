@@ -5,7 +5,7 @@ from fab.steps.analyse import Analyse
 from fab.steps.archive_objects import ArchiveObjects
 from fab.steps.compile_c import CompileC
 from fab.steps.compile_fortran import CompileFortran
-from fab.steps.grab import GrabFolder
+from fab.steps.grab import GrabSvn
 from fab.steps.link_exe import LinkSharedObject
 from fab.steps.preprocess import CPreProcessor, FortranPreProcessor
 from fab.steps.walk_source import FindSourceFiles
@@ -13,7 +13,8 @@ from fab.steps.walk_source import FindSourceFiles
 
 def grab_step():
     # todo: this will be a proper grab step, this is just placeholder
-    return GrabFolder(src="/home/h02/bblay/svn/gcom/trunk/build/", dst_name="gcom")
+    # return GrabFolder(src="/home/h02/bblay/svn/gcom/trunk/build/", dst_label="gcom")
+    return GrabSvn(src='https://code.metoffice.gov.uk/svn/gcom/main/trunk/build', dst_label="gcom")
 
 
 def common_build_steps(fpic=False) -> List[Step]:

@@ -36,8 +36,8 @@ def jules_config():
 
     config.steps = [
 
-        GrabFolder(src='~/svn/jules/trunk/src/', dst_name='src'),
-        GrabFolder(src='~/svn/jules/trunk/utils/', dst_name='util'),
+        GrabFolder(src='~/svn/jules/trunk/src/', dst_label='src'),
+        GrabFolder(src='~/svn/jules/trunk/utils/', dst_label='util'),
 
         FindSourceFiles(file_filtering=[
             (['src/control/um/'], False),

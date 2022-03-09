@@ -79,7 +79,7 @@ class BuildConfig(object):
                         step.run(artefacts=artefacts, config=self)  # todo: smells like an anti pattern
                     send_metric('steps', step.name, step_timer.taken)
         except Exception as err:
-            logger.error(f'error running build steps: {err}')
+            logger.exception(f'error running build steps: {err}')
         finally:
             send_metric('run', 'label', self.label)
             send_metric('run', 'datetime', start_time.isoformat())

@@ -92,11 +92,11 @@ def um_atmos_safe_config():
     config.steps = [
 
         # todo: create a mp GrabFolders step?
-        GrabFolder(src='~/svn/um/trunk/src/', dst_name='um'),
-        GrabFolder(src='~/svn/jules/trunk/src/', dst_name='jules'),
-        GrabFolder(src='~/svn/socrates/trunk/src/', dst_name='socrates'),
-        GrabFolder(src='~/svn/shumlib/trunk/', dst_name='shumlib'),
-        GrabFolder(src='~/svn/casim/src/', dst_name='casim'),
+        GrabFolder(src='~/svn/um/trunk/src/', dst_label='um'),
+        GrabFolder(src='~/svn/jules/trunk/src/', dst_label='jules'),
+        GrabFolder(src='~/svn/socrates/trunk/src/', dst_label='socrates'),
+        GrabFolder(src='~/svn/shumlib/trunk/', dst_label='shumlib'),
+        GrabFolder(src='~/svn/casim/src/', dst_label='casim'),
 
         MyCustomCodeFixes(name="my custom code fixes"),
 
