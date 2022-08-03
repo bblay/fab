@@ -99,7 +99,7 @@ class CompileFortran(MpExeStep):
 
         # compile everything in multiple passes
         uncompiled: Set[AnalysedFile] = set(sum(build_trees.values(), []))
-        logger.info(f"compiling {len(uncompiled)} fortran files")
+        # logger.info(f"compiling {len(uncompiled)} fortran files")
 
         compiled: Dict[Path, CompiledFile] = {}
         while uncompiled:
@@ -116,11 +116,11 @@ class CompileFortran(MpExeStep):
         compile_next = self.get_compile_next(compiled, uncompiled)
 
         # compile
-        logger.info(f"\ncompiling {len(compile_next)} of {len(uncompiled)} remaining files")
+        # logger.info(f"\ncompiling {len(compile_next)} of {len(uncompiled)} remaining files")
         results_this_pass = self.run_mp(items=compile_next, func=self.process_file)
         check_for_errors(results_this_pass, caller_label=self.name)
         compiled_this_pass = list(by_type(results_this_pass, CompiledFile))
-        logger.debug(f"compiled {len(compiled_this_pass)} files")
+        # logger.debug(f"compiled {len(compiled_this_pass)} files")
 
         # hash the modules we just created
         new_mod_hashes = get_mod_hashes(compile_next, config)
@@ -198,8 +198,8 @@ class CompileFortran(MpExeStep):
                 self.compile_file(analysed_file, flags)
             except Exception as err:
                 return Exception("Error compiling file:", err)
-        else:
-            log_or_dot(logger, f'CompileFortran skipping: {analysed_file.fpath}')
+        # else:
+        #     log_or_dot(logger, f'CompileFortran skipping: {analysed_file.fpath}')
 
         # get the hashes of the modules we depend on
         # record them so we know if they've changed next time we compile.
