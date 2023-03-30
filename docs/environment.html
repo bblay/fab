@@ -1,0 +1,570 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="lang:clipboard.copy" content="Copy to clipboard">
+  <meta name="lang:clipboard.copied" content="Copied to clipboard">
+  <meta name="lang:search.language" content="en">
+  <meta name="lang:search.pipeline.stopwords" content="True">
+  <meta name="lang:search.pipeline.trimmer" content="True">
+  <meta name="lang:search.result.none" content="No matching documents">
+  <meta name="lang:search.result.one" content="1 matching document">
+  <meta name="lang:search.result.other" content="# matching documents">
+  <meta name="lang:search.tokenizer" content="[\s\-]+">
+
+  
+    <link href="https://fonts.gstatic.com/" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Roboto+Mono:400,500,700|Roboto:300,400,400i,700&display=fallback" rel="stylesheet">
+
+    <style>
+      body,
+      input {
+        font-family: "Roboto", "Helvetica Neue", Helvetica, Arial, sans-serif
+      }
+
+      code,
+      kbd,
+      pre {
+        font-family: "Roboto Mono", "Courier New", Courier, monospace
+      }
+    </style>
+  
+
+  <link rel="stylesheet" href="_static/stylesheets/application.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-palette.css"/>
+  <link rel="stylesheet" href="_static/stylesheets/application-fixes.css"/>
+  
+  <link rel="stylesheet" href="_static/fonts/material-icons.css"/>
+  
+  <meta name="theme-color" content="#3f51b5">
+  <script src="_static/javascripts/modernizr.js"></script>
+  
+  
+  
+    <title>Environment &#8212; fab 1.0.dev0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/material.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/copybutton.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script src="_static/clipboard.min.js"></script>
+    <script src="_static/copybutton.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Introduction to Configuration" href="config_intro.html" />
+    <link rel="prev" title="Installing Fab" href="install.html" />
+  
+   
+
+  </head>
+  <body dir=ltr
+        data-md-color-primary=blue-grey data-md-color-accent=blue>
+  
+  <svg class="md-svg">
+    <defs data-children-count="0">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" width="416" height="448" viewBox="0 0 416 448" id="__github"><path fill="currentColor" d="M160 304q0 10-3.125 20.5t-10.75 19T128 352t-18.125-8.5-10.75-19T96 304t3.125-20.5 10.75-19T128 256t18.125 8.5 10.75 19T160 304zm160 0q0 10-3.125 20.5t-10.75 19T288 352t-18.125-8.5-10.75-19T256 304t3.125-20.5 10.75-19T288 256t18.125 8.5 10.75 19T320 304zm40 0q0-30-17.25-51T296 232q-10.25 0-48.75 5.25Q229.5 240 208 240t-39.25-2.75Q130.75 232 120 232q-29.5 0-46.75 21T56 304q0 22 8 38.375t20.25 25.75 30.5 15 35 7.375 37.25 1.75h42q20.5 0 37.25-1.75t35-7.375 30.5-15 20.25-25.75T360 304zm56-44q0 51.75-15.25 82.75-9.5 19.25-26.375 33.25t-35.25 21.5-42.5 11.875-42.875 5.5T212 416q-19.5 0-35.5-.75t-36.875-3.125-38.125-7.5-34.25-12.875T37 371.5t-21.5-28.75Q0 312 0 260q0-59.25 34-99-6.75-20.5-6.75-42.5 0-29 12.75-54.5 27 0 47.5 9.875t47.25 30.875Q171.5 96 212 96q37 0 70 8 26.25-20.5 46.75-30.25T376 64q12.75 25.5 12.75 54.5 0 21.75-6.75 42 34 40 34 99.5z"/></svg>
+      
+    </defs>
+  </svg>
+  
+  <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer">
+  <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search">
+  <label class="md-overlay" data-md-component="overlay" for="__drawer"></label>
+  <a href="#environment" tabindex="1" class="md-skip"> Skip to content </a>
+  <header class="md-header" data-md-component="header">
+  <nav class="md-header-nav md-grid">
+    <div class="md-flex navheader">
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <a href="index.html" title="fab 1.0.dev0 documentation"
+           class="md-header-nav__button md-logo">
+          
+            &nbsp;
+          
+        </a>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--menu md-header-nav__button" for="__drawer"></label>
+      </div>
+      <div class="md-flex__cell md-flex__cell--stretch">
+        <div class="md-flex__ellipsis md-header-nav__title" data-md-component="title">
+          <span class="md-header-nav__topic">fab 1.0.dev0 documentation</span>
+          <span class="md-header-nav__topic"> Environment </span>
+        </div>
+      </div>
+      <div class="md-flex__cell md-flex__cell--shrink">
+        <label class="md-icon md-icon--search md-header-nav__button" for="__search"></label>
+        
+<div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" action="search.html" method="get" name="search">
+      <input type="text" class="md-search__input" name="q" placeholder="Search"
+             autocapitalize="off" autocomplete="off" spellcheck="false"
+             data-md-component="query" data-md-state="active">
+      <label class="md-icon md-search__icon" for="__search"></label>
+      <button type="reset" class="md-icon md-search__icon" data-md-component="reset" tabindex="-1">
+        &#xE5CD;
+      </button>
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="result">
+          <div class="md-search-result__meta">
+            Type to start searching
+          </div>
+          <ol class="md-search-result__list"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+      </div>
+      
+      
+  
+  <script src="_static/javascripts/version_dropdown.js"></script>
+  <script>
+    var json_loc = ""versions.json"",
+        target_loc = "../",
+        text = "Versions";
+    $( document ).ready( add_version_dropdown(json_loc, target_loc, text));
+  </script>
+  
+
+    </div>
+  </nav>
+</header>
+
+  
+  <div class="md-container">
+    
+    
+    
+  <nav class="md-tabs" data-md-component="tabs">
+    <div class="md-tabs__inner md-grid">
+      <ul class="md-tabs__list">
+          <li class="md-tabs__item"><a href="index.html" class="md-tabs__link">fab 1.0.dev0 documentation</a></li>
+      </ul>
+    </div>
+  </nav>
+    <main class="md-main">
+      <div class="md-main__inner md-grid" data-md-component="container">
+        
+          <div class="md-sidebar md-sidebar--primary" data-md-component="navigation">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                <nav class="md-nav md-nav--primary" data-md-level="0">
+  <label class="md-nav__title md-nav__title--site" for="__drawer">
+    <a href="index.html" title="fab 1.0.dev0 documentation" class="md-nav__button md-logo">
+      
+        <img src="_static/" alt=" logo" width="48" height="48">
+      
+    </a>
+    <a href="index.html"
+       title="fab 1.0.dev0 documentation">fab 1.0.dev0 documentation</a>
+  </label>
+  
+
+  
+  <ul class="md-nav__list">
+    <li class="md-nav__item">
+    
+      <span class="md-nav__link caption"><span class="caption-text">Contents:</span></span>
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="install.html" class="md-nav__link">Installing Fab</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+    <input class="md-toggle md-nav__toggle" data-md-toggle="toc" type="checkbox" id="__toc">
+    <label class="md-nav__link md-nav__link--active" for="__toc"> Environment </label>
+    
+      <a href="#" class="md-nav__link md-nav__link--active">Environment</a>
+      
+        
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#environment--page-root" class="md-nav__link">Environment</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#requirements" class="md-nav__link">Requirements</a>
+        </li>
+        <li class="md-nav__item"><a href="#running-fab-at-the-met-office" class="md-nav__link">Running Fab at The Met Office</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#vdi" class="md-nav__link">VDI</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#without-clang" class="md-nav__link">Without clang</a>
+        </li>
+        <li class="md-nav__item"><a href="#with-clang" class="md-nav__link">With clang</a>
+        </li>
+        <li class="md-nav__item"><a href="#pycharm" class="md-nav__link">PyCharm</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#rose" class="md-nav__link">Rose</a>
+        </li>
+        <li class="md-nav__item"><a href="#singularity" class="md-nav__link">Singularity</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#authentication" class="md-nav__link">Authentication</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#outside-the-met-office" class="md-nav__link">Outside The Met Office</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#docker" class="md-nav__link">Docker</a>
+        </li>
+        <li class="md-nav__item"><a href="#other" class="md-nav__link">Other</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#using-python-venv" class="md-nav__link">Using Python venv</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/environment.rst.txt">Show Source</a> </li>
+
+  </ul>
+</nav>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="config_intro.html" class="md-nav__link">Introduction to Configuration</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="writing_config.html" class="md-nav__link">How to Write a Build Config</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="advanced_config.html" class="md-nav__link">Advanced Configuration</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="features.html" class="md-nav__link">Features</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="apidoc/modules.html" class="md-nav__link">Api Reference</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="development.html" class="md-nav__link">Developer’s guide</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="glossary.html" class="md-nav__link">Glossary</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="genindex.html" class="md-nav__link">Index</a>
+      
+    
+    </li>
+    <li class="md-nav__item">
+    
+    
+      <a href="py-modindex.html" class="md-nav__link">Python Module Index</a>
+      
+    
+    </li>
+  </ul>
+  
+
+</nav>
+              </div>
+            </div>
+          </div>
+          <div class="md-sidebar md-sidebar--secondary" data-md-component="toc">
+            <div class="md-sidebar__scrollwrap">
+              <div class="md-sidebar__inner">
+                
+<nav class="md-nav md-nav--secondary">
+    <label class="md-nav__title" for="__toc">Contents</label>
+  <ul class="md-nav__list" data-md-scrollfix="">
+        <li class="md-nav__item"><a href="#environment--page-root" class="md-nav__link">Environment</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#requirements" class="md-nav__link">Requirements</a>
+        </li>
+        <li class="md-nav__item"><a href="#running-fab-at-the-met-office" class="md-nav__link">Running Fab at The Met Office</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#vdi" class="md-nav__link">VDI</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#without-clang" class="md-nav__link">Without clang</a>
+        </li>
+        <li class="md-nav__item"><a href="#with-clang" class="md-nav__link">With clang</a>
+        </li>
+        <li class="md-nav__item"><a href="#pycharm" class="md-nav__link">PyCharm</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#rose" class="md-nav__link">Rose</a>
+        </li>
+        <li class="md-nav__item"><a href="#singularity" class="md-nav__link">Singularity</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#authentication" class="md-nav__link">Authentication</a>
+        </li></ul>
+            </nav>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#outside-the-met-office" class="md-nav__link">Outside The Met Office</a><nav class="md-nav">
+              <ul class="md-nav__list">
+        <li class="md-nav__item"><a href="#docker" class="md-nav__link">Docker</a>
+        </li>
+        <li class="md-nav__item"><a href="#other" class="md-nav__link">Other</a>
+        </li></ul>
+            </nav>
+        </li>
+        <li class="md-nav__item"><a href="#using-python-venv" class="md-nav__link">Using Python venv</a>
+        </li></ul>
+            </nav>
+        </li>
+    
+<li class="md-nav__item"><a class="md-nav__extra_link" href="_sources/environment.rst.txt">Show Source</a> </li>
+
+<li id="searchbox" class="md-nav__item"></li>
+
+  </ul>
+</nav>
+              </div>
+            </div>
+          </div>
+        
+        <div class="md-content">
+          <article class="md-content__inner md-typeset" role="main">
+            
+  <section id="environment">
+<span id="id1"></span><h1 id="environment--page-root">Environment<a class="headerlink" href="#environment--page-root" title="Permalink to this heading">¶</a></h1>
+<p>This page describes the environments in which Fab can be run.</p>
+<section id="requirements">
+<span id="id2"></span><h2 id="requirements">Requirements<a class="headerlink" href="#requirements" title="Permalink to this heading">¶</a></h2>
+<p>The minimum dependencies for Fab to build a project are:</p>
+<ul class="simple">
+<li><p>Python &gt;= 3.7</p></li>
+<li><p>Compiler</p></li>
+<li><p>Linker (or archiver, if building libraries)</p></li>
+</ul>
+<p>If your project includes C code:</p>
+<ul class="simple">
+<li><p>libclang</p></li>
+<li><p>python-clang</p></li>
+</ul>
+</section>
+<section id="running-fab-at-the-met-office">
+<h2 id="running-fab-at-the-met-office">Running Fab at The Met Office<a class="headerlink" href="#running-fab-at-the-met-office" title="Permalink to this heading">¶</a></h2>
+<section id="vdi">
+<h3 id="vdi">VDI<a class="headerlink" href="#vdi" title="Permalink to this heading">¶</a></h3>
+<section id="without-clang">
+<h4 id="without-clang">Without clang<a class="headerlink" href="#without-clang" title="Permalink to this heading">¶</a></h4>
+<p>If you don’t need to build C, you can use this modules command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module use $EXTRA_SOFTWARE
+$ module load fab/0.11.0/python/3.7.0
+</pre></div>
+</div>
+</section>
+<section id="with-clang">
+<h4 id="with-clang">With clang<a class="headerlink" href="#with-clang" title="Permalink to this heading">¶</a></h4>
+<p>This is currently a little awkward but will hopefully become simpler soon.
+We use a combination of <em>module</em> commands and <em>conda</em> to get Fab running at The Met Office.
+If you don’t need to compile C code, you may not need conda.
+We create the conda environment as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda env create -f envs/conda/dev_env.yml
+$ conda activate sci-fab
+</pre></div>
+</div>
+<p>Then <a class="reference internal" href="install.html#install"><span class="std std-ref">install fab</span></a>.</p>
+<p>We do this in a before any module commands.
+Then we set up our environment <em>in a new terminal</em> as follows.</p>
+<p>For use with gfortran:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module use $LFRIC_MODULES
+$ module load environment/lfric/gnu
+$ conda activate sci-fab
+$ PYTHONPATH=~/.conda/envs/sci-fab/lib/python3.7/site-packages:$PYTHONPATH
+</pre></div>
+</div>
+<p>For use with ifort:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ module use $LFRIC_MODULES
+$ module load environment/lfric/ifort
+$ conda activate sci-fab
+$ PYTHONPATH=~/.conda/envs/sci-fab/lib/python3.7/site-packages:$PYTHONPATH
+</pre></div>
+</div>
+<p>The PYTHONPATH line gives us access to a newer version of fparser in the conda environment.
+Otherwise we get the older one from the modules commands.</p>
+</section>
+<section id="pycharm">
+<h4 id="pycharm">PyCharm<a class="headerlink" href="#pycharm" title="Permalink to this heading">¶</a></h4>
+<p>If you run <code class="docutils literal notranslate"><span class="pre">pycharm-community</span></code> from the command line, after the above commands,
+PyCharm will be able to run Fab, the tests, etc.
+You can <a class="reference external" href="https://www.jetbrains.com/help/pycharm/configuring-python-interpreter.html">set the project interpreter</a>
+to be that in the conda environment.</p>
+</section>
+</section>
+<section id="rose">
+<h3 id="rose">Rose<a class="headerlink" href="#rose" title="Permalink to this heading">¶</a></h3>
+<p>Various configs for building projects using Rose on SPICE can be found in
+<a class="reference external" href="https://github.com/metomi/fab/tree/master/run_configs">run_configs</a>.</p>
+</section>
+<section id="singularity">
+<span id="run-singularity"></span><h3 id="singularity">Singularity<a class="headerlink" href="#singularity" title="Permalink to this heading">¶</a></h3>
+<p>You can run Fab in a singularity container as follows:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">singularity</span> <span class="n">run</span> <span class="n">oras</span><span class="p">:</span><span class="o">//</span><span class="n">metoffice</span><span class="o">-</span><span class="n">docker</span><span class="o">-</span><span class="n">local</span><span class="o">.</span><span class="n">jfrog</span><span class="o">.</span><span class="n">io</span><span class="o">/</span><span class="n">picasso</span><span class="o">/</span><span class="n">metomi</span><span class="o">/</span><span class="n">fab</span><span class="o">/</span><span class="n">MyImage</span><span class="p">:</span><span class="n">latest</span>
+</pre></div>
+</div>
+<p>If you need to use git from within the container, you’ll need to set a couple of environment variables first:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ export SINGULARITY_BIND="/etc/pki/ca-trust/extracted/pem:/pem"
+$ export SINGULARITYENV_GIT_SSL_CAPATH="/pem"
+$ singularity shell oras://metoffice-docker-local.jfrog.io/picasso/metomi/fab/MyImage:latest
+</pre></div>
+</div>
+<p>See also <a class="reference internal" href="development.html#build-singularity"><span class="std std-ref">Instructions for building the image</span></a>.</p>
+<section id="authentication">
+<h4 id="authentication">Authentication<a class="headerlink" href="#authentication" title="Permalink to this heading">¶</a></h4>
+<p>You’ll need to authenticate if it’s your first time:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ singularity remote login -u firstname.surname@metoffice.gov.uk docker://metoffice-docker-local.jfrog.io
+</pre></div>
+</div>
+<p>You will be asked for your
+<a class="reference external" href="https://metoffice.sharepoint.com/sites/TechnologyCommsSite/SitePages/Tooling/Artifactory/Artifactory-Cloud.aspx#using-api-keys">access token</a>.</p>
+</section>
+</section>
+</section>
+<section id="outside-the-met-office">
+<h2 id="outside-the-met-office">Outside The Met Office<a class="headerlink" href="#outside-the-met-office" title="Permalink to this heading">¶</a></h2>
+<section id="docker">
+<h3 id="docker">Docker<a class="headerlink" href="#docker" title="Permalink to this heading">¶</a></h3>
+<p>The dockerfile in <a class="reference external" href="https://github.com/metomi/fab/tree/master/envs/docker">envs/docker</a>
+can be used to create a container in which to run Fab.
+This work-in-progress solution was tested on Windows, running Ubuntu in WSL.</p>
+<p>Build the image:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker build -t fab envs/docker
+</pre></div>
+</div>
+<p>Run the image, replacing <code class="docutils literal notranslate"><span class="pre">&lt;path_to_fab&gt;</span></code> with the path on your host machine and <code class="docutils literal notranslate"><span class="pre">&lt;user&gt;</span></code> with using your username:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ docker run --env PYTHONPATH=/fab -v &lt;path_to_fab&gt;/source:/fab -v /home/&lt;user&gt;:/home/&lt;user&gt; -it fab bash
+</pre></div>
+</div>
+</section>
+<section id="other">
+<h3 id="other">Other<a class="headerlink" href="#other" title="Permalink to this heading">¶</a></h3>
+<p>You may need to ask your system administrator to install the above requirements.</p>
+</section>
+</section>
+<section id="using-python-venv">
+<h2 id="using-python-venv">Using Python venv<a class="headerlink" href="#using-python-venv" title="Permalink to this heading">¶</a></h2>
+<p>Create an environment using Python’s builtin <cite>venv</cite></p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>python<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>&lt;env<span class="w"> </span>name&gt;
+<span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>&lt;env<span class="w"> </span>name&gt;
+<span class="gp">$ </span>.<span class="w"> </span>bin/activate
+</pre></div>
+</div>
+<p>Then install fab</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>pip<span class="w"> </span>install<span class="w"> </span>sci-fab
+</pre></div>
+</div>
+<p>You’ll have to make sure the non-Python <a class="reference internal" href="#requirements"><span class="std std-ref">requirements</span></a> are installed.</p>
+</section>
+</section>
+
+
+          </article>
+        </div>
+      </div>
+    </main>
+  </div>
+  <footer class="md-footer">
+    <div class="md-footer-nav">
+      <nav class="md-footer-nav__inner md-grid">
+          
+            <a href="install.html" title="Installing Fab"
+               class="md-flex md-footer-nav__link md-footer-nav__link--prev"
+               rel="prev">
+              <div class="md-flex__cell md-flex__cell--shrink">
+                <i class="md-icon md-icon--arrow-back md-footer-nav__button"></i>
+              </div>
+              <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title">
+                <span class="md-flex__ellipsis">
+                  <span
+                      class="md-footer-nav__direction"> Previous </span> Installing Fab </span>
+              </div>
+            </a>
+          
+          
+            <a href="config_intro.html" title="Introduction to Configuration"
+               class="md-flex md-footer-nav__link md-footer-nav__link--next"
+               rel="next">
+            <div class="md-flex__cell md-flex__cell--stretch md-footer-nav__title"><span
+                class="md-flex__ellipsis"> <span
+                class="md-footer-nav__direction"> Next </span> Introduction to Configuration </span>
+            </div>
+            <div class="md-flex__cell md-flex__cell--shrink"><i
+                class="md-icon md-icon--arrow-forward md-footer-nav__button"></i>
+            </div>
+          
+        </a>
+        
+      </nav>
+    </div>
+    <div class="md-footer-meta md-typeset">
+      <div class="md-footer-meta__inner md-grid">
+        <div class="md-footer-copyright">
+          <div class="md-footer-copyright__highlight">
+              &#169; Copyright 2023.
+              
+          </div>
+            Created using
+            <a href="http://www.sphinx-doc.org/">Sphinx</a> 6.1.3.
+             and
+            <a href="https://github.com/bashtage/sphinx-material/">Material for
+              Sphinx</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script src="_static/javascripts/application.js"></script>
+  <script>app.initialize({version: "1.0.4", url: {base: ".."}})</script>
+  </body>
+</html>
